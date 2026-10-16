@@ -14,9 +14,10 @@ export interface Limit {
 export const LIMITS = {
   loginByEmail: { scope: "login-email", max: 5, windowMs: 15 * 60_000 },
   loginByIp: { scope: "login-ip", max: 30, windowMs: 15 * 60_000 },
-  staffCodeByIp: { scope: "staff-code-ip", max: 10, windowMs: 15 * 60_000 },
-  staffCodeByTenant: { scope: "staff-code-tenant", max: 200, windowMs: 15 * 60_000 },
-  pushSubscribeByIp: { scope: "push-sub-ip", max: 30, windowMs: 60 * 60_000 },
+  // zählt nur FEHLversuche (viele Beschäftigte können sich eine Firmen-IP teilen)
+  staffCodeByIp: { scope: "staff-code-ip", max: 20, windowMs: 15 * 60_000 },
+  staffCodeByTenant: { scope: "staff-code-tenant", max: 300, windowMs: 15 * 60_000 },
+  pushSubscribeByIp: { scope: "push-sub-ip", max: 600, windowMs: 60 * 60_000 },
   setupByIp: { scope: "setup-ip", max: 10, windowMs: 60 * 60_000 },
   inviteByIp: { scope: "invite-ip", max: 20, windowMs: 60 * 60_000 },
 } satisfies Record<string, Limit>;

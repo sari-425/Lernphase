@@ -1,0 +1,10 @@
+# Caddy holt und erneuert das HTTPS-Zertifikat automatisch und kostenlos (Let's Encrypt).
+# Zugriffsprotokolle sind standardmäßig AUS (Datenminimierung: keine IP-Logs).
+{$DOMAIN} {
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+	reverse_proxy app:3000
+}

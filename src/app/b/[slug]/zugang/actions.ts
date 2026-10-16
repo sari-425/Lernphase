@@ -4,7 +4,8 @@ import { getDb } from "@/lib/db";
 import { sessionSecret } from "@/lib/env";
 import { clearStaffCookie, clientIp, loadTenant, setStaffCookie } from "@/lib/server/context";
 import { staffAccessToken, verifyStaffCode } from "@/lib/services/tenants";
-import { consume, limitKey, LIMITS } from "@/lib/services/rate-limit";
+import { isLimited, limitKey, LIMITS, recordHit } from "@/lib/services/rate-limit";
+import { AppError } from "@/lib/errors";
 import { toActionState, type ActionState } from "@/lib/server/action-result";
 
 /** Nur Ziele innerhalb DIESES Betriebsrats zulassen (kein Open Redirect). */
@@ -21,10 +22,18 @@ export async function enterStaffCode(slug: string, _prev: ActionState, fd: FormD
     const code = String(fd.get("code") ?? "").slice(0, 64);
     const secret = sessionSecret();
     const ip = await clientIp();
-    await consume(db, limitKey(secret, LIMITS.staffCodeByIp, ip), LIMITS.staffCodeByIp);
-    await consume(db, limitKey(secret, LIMITS.staffCodeByTenant, tenant.id), LIMITS.staffCodeByTenant);
+    const ipKey = limitKey(secret, LIMITS.staffCodeByIp, ip);
+    const tenantKey = limitKey(secret, LIMITS.staffCodeByTenant, tenant.id);
+    if ((await isLimited(db, ipKey, LIMITS.staffCodeByIp)) || (await isLimited(db, tenantKey, LIMITS.staffCodeByTenant))) {
+      throw new AppError("RATE_LIMITED", "Zu viele Fehlversuche. Bitte warten Sie 15 Minuten.");
+    }
     if (!tenant.staffAccessCodeHash) return { ok: false, error: "Für diesen Betriebsrat ist kein Belegschafts-Zugang eingerichtet." };
-    if (!(await verifyStaffCode(tenant, code))) return { ok: false, error: "Der Zugangscode ist nicht korrekt." };
+    if (!(await verifyStaffCode(tenant, code))) {
+      // nur Fehlversuche zählen
+      await recordHit(db, ipKey);
+      await recordHit(db, tenantKey);
+      return { ok: false, error: "Der Zugangscode ist nicht korrekt." };
+    }
     await setStaffCookie(slug, staffAccessToken(secret, tenant));
     target = safeNext(slug, fd.get("weiter"));
   } catch (err) {
