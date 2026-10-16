@@ -127,3 +127,31 @@ export function InviteForm({ action }: { action: Act }) {
     </ActionForm>
   );
 }
+
+export function ResetLinkForm({ action }: { action: Act }) {
+  return (
+    <details className="mt-2">
+      <summary className="cursor-pointer text-sm font-semibold text-brand-800">Passwort vergessen? Link zum Zurücksetzen erzeugen</summary>
+      <ActionForm action={action} className="mt-2 space-y-2">
+        {(s) => {
+          const link = s.data?.link ? (s.data.link.startsWith("http") ? s.data.link : window.location.origin + s.data.link) : null;
+          return (
+            <>
+              <StateMessage s={s} />
+              {link ? (
+                <code className="block rounded bg-slate-100 p-2 text-sm break-all">{link}</code>
+              ) : (
+                <>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" name="resetTotp" className="h-5 w-5" /> auch Zwei-Faktor-Anmeldung zurücksetzen (bei verlorenem Handy)
+                  </label>
+                  <SubmitButton className="btn-secondary">Link erzeugen</SubmitButton>
+                </>
+              )}
+            </>
+          );
+        }}
+      </ActionForm>
+    </details>
+  );
+}

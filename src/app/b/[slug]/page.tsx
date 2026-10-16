@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getDb } from "@/lib/db";
 import { loadTenant, readerAccess } from "@/lib/server/context";
 import { listVisibleMessages } from "@/lib/services/messages";
+import { listVisiblePolls } from "@/lib/services/polls";
 import { MessageCard } from "@/components/message-card";
 import { VisitTracker } from "@/components/new-badge";
 import { EmptyState } from "@/components/ui";
@@ -14,6 +15,7 @@ export default async function TenantHome({ params }: { params: Promise<{ slug: s
   const db = await getDb();
   const current = await listVisibleMessages(db, tenant.id, access, { limit: 6 });
   const important = current.filter((m) => m.priority !== "normal");
+  const openPolls = (await listVisiblePolls(db, tenant.id, access)).filter((p) => p.isOpen);
   const latest = current.filter((m) => m.priority === "normal").slice(0, 5);
 
   return (
@@ -68,6 +70,15 @@ export default async function TenantHome({ params }: { params: Promise<{ slug: s
           <div className="hidden md:block">
             <BrandPanel companyName={tenant.companyName} slogan={tenant.slogan} sloganSub={tenant.sloganSub} compact />
           </div>
+          {openPolls.length > 0 ? (
+            <div className="card space-y-2 border-accent-600">
+              <h2 className="font-bold text-brand-900">📊 Ihre Meinung ist gefragt</h2>
+              <p className="text-sm">{openPolls[0].question}</p>
+              <Link href={`/b/${slug}/umfragen`} className="btn-primary w-full">
+                {openPolls.length > 1 ? `${openPolls.length} laufende Umfragen` : "Zur Umfrage"}
+              </Link>
+            </div>
+          ) : null}
           {tenant.welcomeText ? <p className="card whitespace-pre-line">{tenant.welcomeText}</p> : null}
           <div className="card space-y-3">
             <h2 className="font-bold text-brand-900">Nichts verpassen</h2>

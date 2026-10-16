@@ -434,3 +434,32 @@ export async function purgeDispatches(db: DB, olderThan: Date) {
     .delete(pushDispatches)
     .where(and(inArray(pushDispatches.status, ["done", "failed", "skipped"]), lt(pushDispatches.createdAt, olderThan)));
 }
+
+/**
+ * Test-Benachrichtigung an GENAU ein Gerät (das des angemeldeten BR-Mitglieds),
+ * damit die echte Zustellung über Google/Apple/Mozilla geprüft werden kann.
+ */
+export async function sendTestPush(db: DB, sender: PushSender, tenant: Pick<Tenant, "id" | "slug">, endpoint: string) {
+  const [s] = await db
+    .select()
+    .from(pushSubscriptions)
+    .where(and(eq(pushSubscriptions.tenantId, tenant.id), eq(pushSubscriptions.endpointHash, sha256(endpoint))));
+  if (!s) throw notFound("Dieses Gerät ist für diesen Betriebsrat nicht angemeldet. Bitte zuerst Benachrichtigungen aktivieren.");
+  const payload = JSON.stringify({
+    title: "Test: Betriebsrat Direkt",
+    body: "Push-Benachrichtigungen funktionieren auf diesem Gerät.",
+    url: `/b/${tenant.slug}`,
+    tag: "brd-test",
+  });
+  try {
+    const r = await sender.send({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, payload, { ttlSeconds: 600, urgency: "high" });
+    return r.statusCode;
+  } catch (err) {
+    const code = err instanceof PushSendError ? err.statusCode : 0;
+    if (code === 404 || code === 410) {
+      await db.delete(pushSubscriptions).where(eq(pushSubscriptions.id, s.id));
+      throw invalid("Der Push-Dienst kennt dieses Abo nicht mehr. Bitte Benachrichtigungen neu aktivieren.");
+    }
+    throw new AppError("CONFIG", code ? `Der Push-Dienst hat den Versand abgelehnt (HTTP ${code}). Häufige Ursache: falsche VAPID-Schlüssel.` : "Der Push-Dienst ist vom Server aus nicht erreichbar (Firewall/Netzwerk prüfen).");
+  }
+}

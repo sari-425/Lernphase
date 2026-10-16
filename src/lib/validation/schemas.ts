@@ -152,3 +152,29 @@ export function fieldErrors(err: z.ZodError): Record<string, string> {
   }
   return out;
 }
+
+export const pollInputSchema = z.object({
+  question: z.string().trim().min(5, "Die Frage braucht mindestens 5 Zeichen.").max(200, "Die Frage ist zu lang (max. 200 Zeichen)."),
+  description: z.string().trim().max(1000, "Die Beschreibung ist zu lang.").default(""),
+  options: z
+    .array(z.string().trim().min(1).max(100, "Eine Antwort ist zu lang (max. 100 Zeichen)."))
+    .min(2, "Bitte mindestens 2 Antwortmöglichkeiten angeben (eine pro Zeile).")
+    .max(10, "Höchstens 10 Antwortmöglichkeiten.")
+    .refine((a) => new Set(a.map((x) => x.toLowerCase())).size === a.length, "Antwortmöglichkeiten müssen sich unterscheiden."),
+  visibility: z.enum(["public", "staff"], { message: "Bitte auswählen, wer teilnehmen darf." }),
+  closesAt: z
+    .union([z.literal(""), z.string()])
+    .optional()
+    .transform((v, ctx) => {
+      if (!v) return null;
+      const d = parseBerlinLocal(v);
+      if (!d) {
+        ctx.addIssue({ code: "custom", message: "Ungültiges Datum." });
+        return z.NEVER;
+      }
+      return d;
+    }),
+  resultsPublic: z.boolean().default(true),
+});
+
+export type PollInput = z.output<typeof pollInputSchema>;

@@ -1,6 +1,7 @@
 import { test, expect, type Page, type BrowserContext } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { SETUP_TOKEN } from "../playwright.config";
+import { currentStep, totpCode } from "../src/lib/auth/totp";
 
 /**
  * Zentrale Abläufe Ende-zu-Ende, in fester Reihenfolge (teilen sich eine Datenbank).
@@ -17,6 +18,7 @@ async function expectNoA11yViolations(page: Page, label: string) {
   const res = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
   const serious = res.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
   expect(serious.map((v) => `${label}: ${v.id} – ${v.help} (${v.nodes.length}×)`)).toEqual([]);
+  expect(await page.evaluate(() => document.querySelectorAll("form form").length), `${label}: verschachtelte Formulare`).toBe(0);
 }
 
 async function createMessage(page: Page, opts: { title: string; body: string; visibility: "public" | "staff" | "council"; push?: boolean; priority?: "normal" | "high" | "urgent" }) {
@@ -253,4 +255,101 @@ test("Zurückziehen macht Mitteilung sofort unsichtbar; Abmelden beendet Sitzung
   await expect(admin.getByText("Sie wurden abgemeldet.")).toBeVisible();
   await admin.goto(`/admin/${SLUG}`);
   await expect(admin).toHaveURL(/\/login$/);
+});
+
+async function loginAdmin(page: Page, password = ADMIN.password) {
+  await page.goto("/login");
+  await page.getByLabel("E-Mail-Adresse").fill(ADMIN.email);
+  await page.getByLabel("Passwort").fill(password);
+  await page.getByRole("button", { name: "Anmelden" }).click();
+}
+
+test("Umfrage: anlegen, starten, anonym abstimmen (einmal pro Gerät), Ergebnis", async ({ browser }) => {
+  await loginAdmin(admin);
+  await expect(admin.getByRole("heading", { name: "Übersicht" })).toBeVisible();
+  await admin.goto(`/admin/${SLUG}/umfragen`);
+  await admin.getByLabel("Frage *").fill("Wann soll die nächste Versammlung stattfinden?");
+  await admin.getByLabel(/Antwortmöglichkeiten/).fill("Vormittag\nNachmittag");
+  await admin.getByLabel(/Belegschaft \(mit Zugangscode\)/).check();
+  await admin.getByRole("button", { name: "Als Entwurf speichern" }).click();
+  await expect(admin.getByText("Umfrage gespeichert (Entwurf).")).toBeVisible();
+  await admin.getByRole("button", { name: "Umfrage starten" }).click();
+  await expect(admin.getByText("Umfrage gestartet.")).toBeVisible();
+
+  const ctx = await browser.newContext();
+  const p = await ctx.newPage();
+  await p.goto(`/b/${SLUG}/umfragen`);
+  await expect(p.getByText("Wann soll die nächste Versammlung")).toHaveCount(0);
+  await p.goto(`/b/${SLUG}/zugang`);
+  await p.getByLabel("Belegschafts-Zugangscode").fill(STAFF_CODE);
+  await p.getByRole("button", { name: "Zugang freischalten" }).click();
+  await p.waitForURL(new RegExp(`/b/${SLUG}$`));
+  await expect(p.getByText("Ihre Meinung ist gefragt")).toBeVisible();
+  await p.getByRole("link", { name: "Zur Umfrage" }).click();
+  await p.getByLabel("Nachmittag").check();
+  await p.getByRole("button", { name: "Abstimmen" }).click();
+  await expect(p.getByText("Ihre Stimme wurde anonym gezählt")).toBeVisible();
+  await p.reload();
+  await expect(p.getByText("von diesem Gerät wurde abgestimmt")).toBeVisible();
+  await expect(p.getByText("100 % (1 Stimme)")).toBeVisible();
+  await expect(p.getByRole("button", { name: "Abstimmen" })).toHaveCount(0);
+  await expectNoA11yViolations(p, "Umfragen");
+  await ctx.close();
+
+  await admin.getByRole("button", { name: "Umfrage beenden" }).click();
+  await expect(admin.getByText("Umfrage beendet.")).toBeVisible();
+});
+
+test("Aushang mit QR-Code und Passwort-Reset-Link für Redakteur", async ({ browser }) => {
+  await admin.goto(`/admin/${SLUG}/aushang`);
+  await expect(admin.getByRole("heading", { name: "Infos vom Betriebsrat aufs Handy" })).toBeVisible();
+  await expect(admin.getByRole("img", { name: /QR-Code/ })).toBeVisible();
+  for (const path of ["", "/mitteilungen/neu", "/team", "/umfragen", "/einstellungen", "/kontakte", "/kategorien"]) {
+    await admin.goto(`/admin/${SLUG}${path}`);
+    await expectNoA11yViolations(admin, `Verwaltung${path || " Übersicht"}`);
+  }
+
+  await admin.goto(`/admin/${SLUG}/team`);
+  await admin.getByText("Passwort vergessen? Link zum Zurücksetzen erzeugen").click();
+  await admin.getByRole("button", { name: "Link erzeugen" }).click();
+  const link = await admin.locator("code").filter({ hasText: "/passwort/" }).innerText();
+  const ctx = await browser.newContext();
+  const ed = await ctx.newPage();
+  await ed.goto(link);
+  await ed.getByLabel(/Neues Passwort/).fill("Neues-Redaktion-PW-2026");
+  await ed.getByLabel("Wiederholen").fill("Neues-Redaktion-PW-2026");
+  await ed.getByRole("button", { name: "Passwort speichern" }).click();
+  await expect(ed.getByRole("heading", { name: "Übersicht" })).toBeVisible();
+  const again = await ctx.newPage();
+  await again.goto(link);
+  await expect(again.getByText("Link ungültig")).toBeVisible();
+  await ctx.close();
+});
+
+test("Zwei-Faktor-Anmeldung einrichten und damit anmelden", async ({ browser }) => {
+  await admin.goto("/konto");
+  await admin.getByRole("button", { name: "Zwei-Faktor-Anmeldung einrichten" }).click();
+  const secret = (await admin.locator("code").first().innerText()).replace(/\s/g, "");
+  await admin.getByLabel(/Angezeigten 6-stelligen Code/).fill(totpCode(secret, currentStep()));
+  await admin.getByRole("button", { name: "Bestätigen und aktivieren" }).click();
+  await expect(admin.getByText("Wiederherstellungscodes sichern")).toBeVisible();
+  await admin.getByRole("link", { name: "Fertig" }).click();
+  await expectNoA11yViolations(admin, "Konto");
+
+  const ctx = await browser.newContext();
+  const p = await ctx.newPage();
+  await loginAdmin(p);
+  await expect(p.getByRole("heading", { name: "Bestätigungscode" })).toBeVisible();
+  // ohne Code kein Zugriff auf die Verwaltung
+  await p.goto(`/admin/${SLUG}`);
+  await expect(p).toHaveURL(/\/login$/);
+  await loginAdmin(p);
+  await p.getByLabel(/6-stelliger Code/).fill("000000");
+  await p.getByRole("button", { name: "Anmelden" }).click();
+  await expect(p.getByText("Der Code ist nicht korrekt.")).toBeVisible();
+  // nächster Zeitschritt, damit der Code nicht schon bei der Einrichtung benutzt wurde
+  await p.getByLabel(/6-stelliger Code/).fill(totpCode(secret, currentStep() + 1));
+  await p.getByRole("button", { name: "Anmelden" }).click();
+  await expect(p.getByRole("heading", { name: "Übersicht" })).toBeVisible();
+  await ctx.close();
 });

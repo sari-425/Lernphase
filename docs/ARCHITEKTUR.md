@@ -50,6 +50,8 @@ tenants ───┬── memberships ── users ── sessions
            ├── categories
            ├── messages ──┬── attachments
            │              └── push_dispatches (1 pro Mitteilung, UNIQUE)
+           ├── polls ── poll_votes (anonym)
+           ├── password_resets
            ├── contacts
            ├── push_subscriptions (anonym)
            └── audit_log
@@ -59,7 +61,9 @@ rate_limit_events (nur HMAC-Schlüssel)
 | Tabelle | Inhalt | Personenbezug |
 |---|---|---|
 | tenants | Name, Kurzadresse, Darstellung, Hash des Belegschafts-Codes | nein |
-| users | E-Mail, Name, scrypt-Passwort-Hash | ja (nur BR-Mitglieder) |
+| users | E-Mail, Name, scrypt-Passwort-Hash, optional verschlüsseltes TOTP-Geheimnis | ja (nur BR-Mitglieder) |
+| polls / poll_votes | Frage, Antworten / gewählte Antwort + HMAC(Geräte-Cookie) bis Umfrageende | Stimmen anonym |
+| password_resets | Hash des Reset-Tokens, Ablauf | indirekt |
 | memberships | Rolle je Betriebsrat (admin/editor + canPublish) | ja |
 | sessions | SHA-256 des Tokens, Ablauf | indirekt |
 | messages | Titel, Inhalt, Kategorie, Priorität, Status, Bereich, Zeiten, Push-Texte | soll keinen haben (Warnprüfung) |
@@ -84,7 +88,10 @@ rate_limit_events (nur HMAC-Schlüssel)
 | Mitteilungen verfassen, Entwürfe bearbeiten | – | ✔ | ✔ | ✔ |
 | Veröffentlichen / planen / archivieren / zurückziehen / Push auslösen | – | – | ✔ | ✔ |
 | Endgültig löschen | – | – | – | ✔ |
-| Team, Einstellungen, Kontakte, Kategorien, Protokoll | – | – | – | ✔ |
+| Umfragen entwerfen | – | ✔ | ✔ | ✔ |
+| Umfragen starten/beenden | – | – | ✔ | ✔ |
+| Umfragen löschen | – | – | – | ✔ |
+| Team, Einstellungen, Kontakte, Kategorien, Protokoll, Reset-Links | – | – | – | ✔ |
 
 Durchsetzung: `src/lib/auth/permissions.ts` + jede Service-Funktion ruft `assertCan(...)` auf und filtert **jede** Abfrage nach `tenant_id` des Akteurs. Die Oberfläche blendet Knöpfe nur zusätzlich aus.
 
@@ -137,9 +144,11 @@ scripts/               CLI: Migration, Betriebsräte, Geheimnisse, Icons
 deploy/                Caddy, Backup
 ```
 
+## Umfragen (Stimmungsbild)
+
+Anonym, eine Stimme pro **Gerät** (zufälliger Cookie → HMAC je Umfrage, nach Ende gelöscht). Mehrfachabstimmung über mehrere Geräte ist nicht ausgeschlossen – deshalb ausdrücklich unverbindlich und kein Ersatz für Wahlen/Beschlüsse. Personenbezogene Identifikation hätte das Vertrauen und den Datenschutz gefährdet; das ist die bewusste Abwägung.
+
 ## Spätere Erweiterungen (vorbereitet, nicht umgesetzt)
 
 - Native Hülle (Capacitor) für App-Store-Präsenz – nur falls nötig.
-- Umfragen/Abstimmungen: bewusst **nicht** umgesetzt. Ohne Identität sind Mehrfachabstimmungen nicht verhinderbar; mit Identität entsteht ein Datenschutz- und Vertrauensproblem. Für unverbindliche Stimmungsbilder kann ein Link auf ein datenschutzfreundliches Umfragetool gesetzt werden.
-- Zwei-Faktor-Anmeldung (TOTP) für Administratoren.
 - Eigene Subdomains je Betriebsrat.

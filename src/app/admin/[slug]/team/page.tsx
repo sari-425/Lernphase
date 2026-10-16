@@ -2,12 +2,12 @@ import { getDb } from "@/lib/db";
 import { requireActor } from "@/lib/server/context";
 import { listTeam } from "@/lib/services/tenants";
 import { can } from "@/lib/auth/permissions";
-import { InviteForm } from "@/components/action-forms";
+import { InviteForm, ResetLinkForm } from "@/components/action-forms";
 import { NoPermission } from "@/components/no-permission";
 import { PageTitle } from "@/components/ui";
 import { SubmitButton } from "@/components/submit-button";
 import { formatDate, formatDateTime } from "@/lib/time";
-import { inviteAction, removeMemberAction, revokeInviteAction, updateMemberAction } from "../actions";
+import { inviteAction, passwordResetAction, removeMemberAction, revokeInviteAction, updateMemberAction } from "../actions";
 
 export const metadata = { title: "Team" };
 
@@ -27,6 +27,7 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
               <div>
                 <p className="font-semibold">{m.displayName}{m.userId === actor.userId ? " (Sie)" : ""}</p>
                 <p className="text-sm text-muted">{m.email} · seit {formatDate(m.since)}</p>
+                {m.userId !== actor.userId ? <ResetLinkForm action={passwordResetAction.bind(null, slug, m.userId)} /> : null}
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <form action={updateMemberAction.bind(null, slug, m.userId)} className="flex flex-wrap items-center gap-2">

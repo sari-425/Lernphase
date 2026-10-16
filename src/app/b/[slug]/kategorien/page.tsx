@@ -17,6 +17,11 @@ export default async function CategoriesPage({ params }: { params: Promise<{ slu
   return (
     <div>
       <PageTitle sub="Mitteilungen nach Thema">Themen</PageTitle>
+      <p className="mb-4">
+        <Link href={`/b/${slug}/umfragen`} className="card flex min-h-16 items-center justify-between gap-3 font-semibold text-brand-900 hover:bg-brand-50">
+          📊 Umfragen <span aria-hidden="true">→</span>
+        </Link>
+      </p>
       <ul className="grid gap-3 sm:grid-cols-2">
         {cats.map((c) => (
           <li key={c.id}>

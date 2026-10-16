@@ -26,7 +26,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <p className="mt-4 text-sm text-muted">
         Beschäftigte brauchen kein Konto. <Link href="/" className="link">Zur Startseite</Link>
       </p>
-      <p className="mt-2 text-sm text-muted">Passwort vergessen? Bitte wenden Sie sich an eine Administratorin bzw. einen Administrator Ihres Betriebsrats – sie können Sie neu einladen.</p>
+      <p className="mt-2 text-sm text-muted">Passwort vergessen? Eine Administratorin bzw. ein Administrator Ihres Betriebsrats kann Ihnen unter „Team“ einen Link zum Zurücksetzen erzeugen.</p>
     </main>
   );
 }

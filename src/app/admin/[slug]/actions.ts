@@ -26,7 +26,10 @@ import {
   updateMessage,
   withdrawMessage,
 } from "@/lib/services/messages";
-import { triggerPush } from "@/lib/services/push";
+import { sendTestPush, triggerPush } from "@/lib/services/push";
+import { pushSender } from "@/lib/server/push-runtime";
+import { consume, limitKey } from "@/lib/services/rate-limit";
+import { sessionSecret } from "@/lib/env";
 import {
   createInvitation,
   removeMember,
@@ -44,6 +47,9 @@ import {
   updateContact,
 } from "@/lib/services/directory";
 import { env } from "@/lib/env";
+import { createPasswordReset } from "@/lib/services/account";
+import { closePoll, createPoll, deletePoll, openPoll, updatePoll } from "@/lib/services/polls";
+import { pollInputSchema } from "@/lib/validation/schemas";
 
 const str = (fd: FormData, k: string) => {
   const v = fd.get(k);
@@ -302,4 +308,101 @@ export async function deleteCategoryAction(slug: string, id: string) {
     await setFlash(toActionState(err).error ?? "Fehler", "error");
   }
   redirect(`/admin/${slug}/kategorien`);
+}
+
+export async function passwordResetAction(slug: string, userId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
+  try {
+    const { actor } = await requireActor(slug);
+    if (userId === actor.userId) return { ok: false, error: "Ihr eigenes Passwort ändern Sie unter „Mein Konto“." };
+    const token = await createPasswordReset(await getDb(), actor, userId, { resetTotp: fd.get("resetTotp") === "on" });
+    return { ok: true, notice: "Link erstellt (24 Stunden gültig, einmal nutzbar). Bitte persönlich weitergeben.", data: { link: `${env().APP_URL ?? ""}/passwort/${token}` } };
+  } catch (err) {
+    return toActionState(err);
+  }
+}
+
+// ---------- Umfragen ----------
+
+function pollFromForm(fd: FormData) {
+  return pollInputSchema.parse({
+    question: str(fd, "question"),
+    description: str(fd, "description"),
+    options: str(fd, "options").split(/\r?\n/).map((x) => x.trim()).filter(Boolean),
+    visibility: str(fd, "visibility") || undefined,
+    closesAt: str(fd, "closesAt"),
+    resultsPublic: fd.get("resultsPublic") === "on",
+  });
+}
+
+export async function savePollAction(slug: string, id: string | null, _prev: ActionState, fd: FormData): Promise<ActionState> {
+  let target: string;
+  try {
+    const { actor } = await requireActor(slug);
+    const input = pollFromForm(fd);
+    if (id) {
+      await updatePoll(await getDb(), actor, id, input);
+      target = `/admin/${slug}/umfragen/${id}`;
+    } else {
+      const p = await createPoll(await getDb(), actor, input);
+      target = `/admin/${slug}/umfragen/${p.id}`;
+    }
+    await setFlash("Umfrage gespeichert (Entwurf).");
+  } catch (err) {
+    return toActionState(err);
+  }
+  redirect(target);
+}
+
+export async function openPollAction(slug: string, id: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
+  try {
+    const { actor } = await requireActor(slug);
+    await openPoll(await getDb(), actor, id, { confirmPublic: fd.get("confirmPublic") === "on" });
+    await setFlash("Umfrage gestartet.");
+  } catch (err) {
+    return toActionState(err);
+  }
+  revalidatePath(`/b/${slug}`, "layout");
+  redirect(`/admin/${slug}/umfragen/${id}`);
+}
+
+export async function closePollAction(slug: string, id: string) {
+  const { actor } = await requireActor(slug);
+  try {
+    await closePoll(await getDb(), actor, id);
+    await setFlash("Umfrage beendet. Die Gerätekennungen wurden gelöscht, nur die Zählung bleibt.");
+  } catch (err) {
+    await setFlash(toActionState(err).error ?? "Fehler", "error");
+  }
+  revalidatePath(`/b/${slug}`, "layout");
+  redirect(`/admin/${slug}/umfragen/${id}`);
+}
+
+export async function deletePollAction(slug: string, id: string, fd: FormData) {
+  const { actor } = await requireActor(slug);
+  if (fd.get("confirmDelete") !== "on") {
+    await setFlash("Bitte das Löschen ausdrücklich bestätigen.", "error");
+    redirect(`/admin/${slug}/umfragen/${id}`);
+  }
+  await deletePoll(await getDb(), actor, id);
+  await setFlash("Umfrage gelöscht.");
+  revalidatePath(`/b/${slug}`, "layout");
+  redirect(`/admin/${slug}/umfragen`);
+}
+
+const TEST_PUSH_LIMIT = { scope: "test-push", max: 5, windowMs: 10 * 60_000 };
+
+export async function testPushAction(slug: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
+  try {
+    const { tenant, actor } = await requireActor(slug);
+    const sender = pushSender();
+    if (!sender) return { ok: false, error: "Push ist auf dem Server nicht eingerichtet (VAPID-Schlüssel fehlen)." };
+    const db = await getDb();
+    await consume(db, limitKey(sessionSecret(), TEST_PUSH_LIMIT, actor.userId), TEST_PUSH_LIMIT);
+    const endpoint = str(fd, "endpoint");
+    if (!endpoint.startsWith("https://")) return { ok: false, error: "Auf diesem Gerät ist kein Push-Abo vorhanden." };
+    const code = await sendTestPush(db, sender, tenant, endpoint);
+    return { ok: true, notice: `Vom Push-Dienst angenommen (HTTP ${code}). Die Benachrichtigung sollte in wenigen Sekunden erscheinen. Kommt nichts an: Mitteilungen/Fokus-Modus des Geräts prüfen.` };
+  } catch (err) {
+    return toActionState(err);
+  }
 }

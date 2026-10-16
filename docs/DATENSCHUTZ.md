@@ -25,6 +25,10 @@
 | HMAC aus IP / E-Mail | Besucher | Schutz vor Brute-Force | Art. 6 Abs. 1 lit. f | 24 h |
 | Belegschafts-Cookie | Leser/innen, ohne Personenbezug | Zugangsschutz | § 25 Abs. 2 Nr. 2 TDDDG | 180 Tage / Codewechsel |
 | „Letzter Besuch“ | nur im Browser | „Neu“-Markierung | § 25 Abs. 2 Nr. 2 TDDDG (prüfen) | durch Nutzer/Browser |
+| Umfrage-Stimme (Antwort) | anonym | Stimmungsbild | Art. 6 Abs. 1 lit. f | durch BR (Löschen der Umfrage) |
+| Prüfsumme aus Geräte-Cookie (Umfrage) | pseudonym | eine Stimme je Gerät | Art. 6 Abs. 1 lit. f, § 25 Abs. 2 Nr. 2 TDDDG (prüfen) | mit Ende der Umfrage |
+| TOTP-Geheimnis (verschlüsselt), Hashes der Wiederherstellungscodes | BR-Mitglieder | Zwei-Faktor-Anmeldung | Art. 6 Abs. 1 lit. f, Art. 32 | beim Ausschalten / Löschen des Kontos |
+| Passwort-Reset-Link (Hash) | BR-Mitglieder | Zugang wiederherstellen | Art. 6 Abs. 1 lit. b/f | 24 h gültig, 7 Tage danach gelöscht |
 | Kontaktdaten Ansprechpartner | BR-Mitglieder | Erreichbarkeit | Einwilligung der eingetragenen Person empfohlen | durch Admin |
 
 **Nicht verarbeitet:** Klarnamen von Beschäftigten, private Telefonnummern/E-Mails, Standort, Geräte-IDs, Leseverhalten, Analyse-/Werbe-Cookies, Daten an KI-Anbieter.
@@ -49,7 +53,8 @@
 - Warnprüfung auf personenbezogene/vertrauliche Inhalte vor Veröffentlichung an die Belegschaft
 - Anhänge: Typprüfung per Inhalt, 5 MB, nur über berechtigte Route, `Content-Disposition: attachment`, Sandbox-CSP
 - Service Worker speichert keine Inhalte
-- Automatische Löschfristen (`src/lib/services/maintenance.ts`, stündlich)
+- Automatische Löschfristen (`src/lib/services/maintenance.ts`, stündlich), inkl. Anonymisierung beendeter Umfragen
+- Zwei-Faktor-Anmeldung (TOTP) für Betriebsratsmitglieder
 - Endgültiges Löschen von Mitteilungen, Mitgliedern und ganzen Betriebsräten
 - Keine externen Skripte, Schriftarten, CDNs, Tracker (alles vom eigenen Server)
 
@@ -71,7 +76,10 @@
 - [ ] Mitbestimmung beachten: Die App erfasst kein Leseverhalten, ist also nicht zur Leistungs-/Verhaltenskontrolle geeignet (§ 87 Abs. 1 Nr. 6 BetrVG) – das ist bewusst so gebaut; trotzdem transparent kommunizieren
 - [ ] Auf Arbeitgeber-Geräten (MDM) können Arbeitgeber ggf. App-Nutzung sehen – Beschäftigte darauf hinweisen, dass private Geräte freiwillig sind
 
-## 6. Offene Fragen
+## 6. Hinweis zu Umfragen
+Umfragen sind bewusst als **unverbindliches Stimmungsbild** gestaltet: anonym, eine Stimme pro Gerät (nicht pro Person). Für Wahlen, Urabstimmungen oder Beschlüsse des Betriebsrats (§ 33 BetrVG) sind sie **nicht** geeignet. Ergebnisse kleiner Gruppen können Rückschlüsse auf Einzelne erlauben – bei sehr kleinen Teilnehmerzahlen Ergebnisse nicht veröffentlichen.
+
+## 7. Offene Fragen
 
 1. Gilt der Arbeitgeber auch für diese App als Verantwortlicher, obwohl der Betriebsrat sie unabhängig betreibt? (umstritten; Auswirkung auf AVV und Datenschutzerklärung)
 2. Ist der gemeinsame Belegschafts-Code als Zugangsschutz für die geplanten Inhalte ausreichend? (für wirklich vertrauliche Inhalte: **nein**)

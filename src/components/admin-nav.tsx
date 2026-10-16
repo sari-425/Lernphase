@@ -8,6 +8,7 @@ export function AdminNav({ slug, isAdmin }: { slug: string; isAdmin: boolean }) 
   const items = [
     { href: base, label: "Übersicht", exact: true },
     { href: `${base}/mitteilungen`, label: "Mitteilungen" },
+    { href: `${base}/umfragen`, label: "Umfragen" },
     ...(isAdmin
       ? [
           { href: `${base}/team`, label: "Team" },

@@ -32,7 +32,9 @@ Ergebnis: `https://ihre-domain.de` mit automatischem HTTPS, PostgreSQL, täglich
 5. **Starten:** `docker compose up -d --build` – Caddy holt das Zertifikat automatisch (Port 80/443 müssen erreichbar sein).
 6. **Prüfen:** `https://betriebsrat.ihre-domain.de/api/health` → `{"ok":true,"push":true}`
 7. **Betriebsrat anlegen:** `https://…/einrichtung` mit dem `SETUP_TOKEN` öffnen. Danach `SETUP_TOKEN=` in `.env` leeren und `docker compose up -d` ausführen.
-8. **Backups** einrichten (siehe unten).
+8. **Aushang:** In der Verwaltung → „Aushang mit QR-Code“ → drucken und aushängen.
+9. **Backups** einrichten (siehe unten).
+10. **Zwei-Faktor-Anmeldung** für alle Admins unter „Mein Konto“ aktivieren.
 
 ### Alternative ohne Docker (z. B. vorhandener Server mit Node.js 22 + PostgreSQL)
 ```bash
@@ -60,9 +62,13 @@ Automatisiert getestet ist der Versand inkl. Verschlüsselung gegen einen lokale
 | Windows/macOS + Chrome/Edge/Firefox | Aktivieren → Erlauben | Benachrichtigung des Betriebssystems |
 | macOS Safari | Aktivieren → Erlauben | wie oben |
 
-Dann im Admin eine öffentliche Testmitteilung mit Push veröffentlichen; im Dashboard „Letzte Push-Versände“ muss „übergeben x von y“ stehen und auf den Geräten eine Benachrichtigung erscheinen. Klick öffnet die Mitteilung. Danach „Benachrichtigungen deaktivieren“ testen.
+**Schnellster Test:** Auf dem Gerät Benachrichtigungen aktivieren, dann als Betriebsratsmitglied auf demselben Gerät anmelden → Übersicht → „Test-Benachrichtigung an dieses Gerät“. Die App meldet, ob der Push-Dienst die Nachricht angenommen hat (bzw. die genaue Fehlerursache).
+
+Danach im Admin eine öffentliche Testmitteilung mit Push veröffentlichen; im Dashboard „Letzte Push-Versände“ muss „übergeben x von y“ stehen und auf den Geräten eine Benachrichtigung erscheinen. Klick öffnet die Mitteilung. Danach „Benachrichtigungen deaktivieren“ testen.
 
 ## Backups und Wiederherstellung
+
+*(Ablauf am 16.10.2026 mit dem Docker-Stack getestet: Backup → Daten gelöscht → Wiederherstellung → Daten wieder vorhanden.)*
 
 **Backup** (täglich per cron):
 ```bash

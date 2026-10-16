@@ -11,6 +11,8 @@ import type { Actor } from "@/lib/auth/permissions";
 import type { Tenant } from "@/lib/db/schema";
 
 export const SESSION_COOKIE = "brd_session";
+/** zufälliger Gerätewert nur gegen Doppelabstimmung bei Umfragen */
+export const DEVICE_COOKIE = "brd_device";
 export const staffCookieName = (slug: string) => `brd_staff_${slug.replace(/-/g, "_")}`;
 
 export async function setSessionCookie(token: string) {
@@ -21,6 +23,22 @@ export async function setSessionCookie(token: string) {
     path: "/",
     maxAge: 7 * 24 * 3600,
   });
+}
+
+export const PENDING_2FA_COOKIE = "brd_2fa";
+
+export async function setPendingLogin(value: string) {
+  (await cookies()).set(PENDING_2FA_COOKIE, value, {
+    httpOnly: true,
+    secure: cookieSecure(),
+    sameSite: "lax",
+    path: "/",
+    maxAge: 5 * 60,
+  });
+}
+
+export async function currentSessionToken() {
+  return (await cookies()).get(SESSION_COOKIE)?.value;
 }
 
 export async function clearSessionCookie() {

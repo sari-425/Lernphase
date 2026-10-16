@@ -12,8 +12,8 @@ export default async function AdminLayout({ children, params }: { children: Reac
   const { tenant, actor, user } = await requireActor(slug);
   const flash = await readFlash();
   return (
-    <div className="flex min-h-full flex-col bg-slate-50">
-      <header className="bg-brand-900 text-white">
+    <div className="flex min-h-full flex-col bg-slate-50 print:bg-white">
+      <header className="bg-brand-900 text-white print:hidden">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-4 py-2.5">
           <Link href={`/admin/${slug}`} className="flex min-w-0 flex-1 items-center gap-3 rounded">
             <span className="rounded-lg bg-[#111111] p-1"><LogoMark className="h-9 w-9" title="" /></span>
@@ -23,14 +23,15 @@ export default async function AdminLayout({ children, params }: { children: Reac
             </span>
           </Link>
           <Link href={`/b/${slug}`} className="btn-ghost px-3 text-sm text-white hover:bg-white/10">Ansicht für Beschäftigte</Link>
+          <Link href="/konto" className="btn-ghost px-3 text-sm text-white hover:bg-white/10">Mein Konto</Link>
           <form action={logoutAction}>
             <button type="submit" className="btn-ghost px-3 text-sm text-white hover:bg-white/10" title={user.email}>Abmelden</button>
           </form>
         </div>
       </header>
-      <AdminNav slug={slug} isAdmin={actor.role === "admin"} />
+      <div className="print:hidden"><AdminNav slug={slug} isAdmin={actor.role === "admin"} /></div>
       <main id="inhalt" className="mx-auto w-full max-w-6xl flex-1 px-4 py-6">
-        {flash ? <div className="mb-5"><Alert kind={flash.kind}>{flash.text}</Alert></div> : null}
+        {flash ? <div className="mb-5 print:hidden"><Alert kind={flash.kind}>{flash.text}</Alert></div> : null}
         {children}
       </main>
     </div>

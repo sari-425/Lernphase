@@ -69,6 +69,13 @@ export const users = pgTable("users", {
   displayName: text("display_name").notNull(),
   passwordHash: text("password_hash").notNull(),
   isActive: boolean("is_active").notNull().default(true),
+  /** TOTP-Geheimnis, verschlüsselt (AES-256-GCM) */
+  totpSecretEnc: text("totp_secret_enc"),
+  totpEnabled: boolean("totp_enabled").notNull().default(false),
+  /** zuletzt verwendeter TOTP-Zeitschritt (Schutz vor Wiederverwendung) */
+  totpLastStep: integer("totp_last_step"),
+  /** SHA-256-Hashes der Wiederherstellungscodes */
+  recoveryCodeHashes: jsonb("recovery_code_hashes").$type<string[] | null>(),
   createdAt: ts("created_at").notNull().defaultNow(),
 });
 
@@ -259,6 +266,69 @@ export const pushDispatches = pgTable(
   (t) => [index("push_dispatches_status_idx").on(t.status, t.notBefore)],
 );
 
+/** Passwort-Zurücksetzen per Link, den ein Admin erzeugt (kein E-Mail-Versand). */
+export const passwordResets = pgTable(
+  "password_resets",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    tenantId: uuid("tenant_id")
+      .notNull()
+      .references(() => tenants.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull().unique(),
+    resetTotp: boolean("reset_totp").notNull().default(false),
+    createdBy: uuid("created_by").references(() => users.id, { onDelete: "set null" }),
+    createdAt: ts("created_at").notNull().defaultNow(),
+    expiresAt: ts("expires_at").notNull(),
+    usedAt: ts("used_at"),
+  },
+  (t) => [index("password_resets_user_idx").on(t.userId)],
+);
+
+export const pollStatusEnum = pgEnum("poll_status", ["draft", "open", "closed"]);
+
+/**
+ * Umfragen als anonymes, unverbindliches Stimmungsbild.
+ * Keine Personendaten; Doppelabstimmung wird nur pro Gerät erschwert.
+ */
+export const polls = pgTable(
+  "polls",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tenantId: uuid("tenant_id")
+      .notNull()
+      .references(() => tenants.id, { onDelete: "cascade" }),
+    question: text("question").notNull(),
+    description: text("description").notNull().default(""),
+    options: jsonb("options").$type<{ id: string; label: string }[]>().notNull(),
+    visibility: visibilityEnum("visibility").notNull().default("staff"),
+    status: pollStatusEnum("status").notNull().default("draft"),
+    closesAt: ts("closes_at"),
+    resultsPublic: boolean("results_public").notNull().default(true),
+    createdBy: uuid("created_by").references(() => users.id, { onDelete: "set null" }),
+    createdAt: ts("created_at").notNull().defaultNow(),
+    openedAt: ts("opened_at"),
+    closedAt: ts("closed_at"),
+  },
+  (t) => [index("polls_tenant_idx").on(t.tenantId, t.status)],
+);
+
+export const pollVotes = pgTable(
+  "poll_votes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    pollId: uuid("poll_id")
+      .notNull()
+      .references(() => polls.id, { onDelete: "cascade" }),
+    /** HMAC(Geräte-Zufallswert, Umfrage) – nach Ende der Umfrage gelöscht (NULL) */
+    voterHash: text("voter_hash"),
+    optionId: text("option_id").notNull(),
+  },
+  (t) => [uniqueIndex("poll_votes_voter_uq").on(t.pollId, t.voterHash), index("poll_votes_poll_idx").on(t.pollId)],
+);
+
 export const auditLog = pgTable(
   "audit_log",
   {
@@ -298,3 +368,4 @@ export type Role = (typeof roleEnum.enumValues)[number];
 export type MessageStatus = (typeof messageStatusEnum.enumValues)[number];
 export type Visibility = (typeof visibilityEnum.enumValues)[number];
 export type Priority = (typeof priorityEnum.enumValues)[number];
+export type Poll = typeof polls.$inferSelect;

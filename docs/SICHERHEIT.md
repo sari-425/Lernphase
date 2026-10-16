@@ -5,6 +5,8 @@
 | Bereich | Maßnahme | Test |
 |---|---|---|
 | Authentifizierung | scrypt-Hashes, Timing-sicherer Vergleich, gleiche Fehlermeldung für unbekannte E-Mail/falsches Passwort | `auth-retention.test.ts` |
+| Zwei-Faktor | TOTP (RFC 6238, mit RFC-Testvektoren geprüft), Geheimnis AES-256-GCM-verschlüsselt, Schutz vor Code-Wiederverwendung (atomar), 8 Wiederherstellungscodes, 5 Fehlversuche/15 min | `totp.test.ts`, `account.test.ts`, E2E |
+| Passwort-Reset | einmaliger Link (24 h) durch Admin; nur für Konten, die ausschließlich zu diesem Betriebsrat gehören (keine Übernahme über Mandantengrenzen); beendet alle Sitzungen | `account.test.ts`, E2E |
 | Brute-Force | Ratenbegrenzung Login (E-Mail + IP), Belegschafts-Code, Push-Abo, Einrichtung, Einladungen | `auth-retention.test.ts` |
 | Sitzungen | 256-Bit-Token, nur Hash in DB, 24 h Inaktivität, 7 Tage absolut, Abmeldung löscht serverseitig | Unit + E2E |
 | Autorisierung | Rechte im Service-Layer, nie nur UI | `permissions.test.ts`, `messages-workflow.test.ts`, E2E Redakteur |
@@ -32,13 +34,14 @@
 - [ ] Domain mit HTTPS (Caddy), Port 3000/5432 nicht öffentlich
 - [ ] Server: automatische Sicherheitsupdates (`unattended-upgrades`), SSH nur mit Schlüssel, Firewall (nur 22/80/443)
 - [ ] Backup einrichten **und Wiederherstellung einmal testen**
-- [ ] Administratoren: starke, einzigartige Passwörter (Passwortmanager)
+- [ ] Administratoren: starke, einzigartige Passwörter (Passwortmanager) **und Zwei-Faktor-Anmeldung** („Mein Konto“)
 - [ ] Monatlich: `git pull`, `npm audit`, Container neu bauen (siehe `docs/BETRIEB.md`)
 
 ## Bekannte Grenzen
 
-- Kein Zwei-Faktor-Login (geplant). Ausgleich: lange Passwörter, Ratenbegrenzung.
-- Kein „Passwort vergessen“ per E-Mail (bewusst, kein Mailserver). Ausgleich: Admin entfernt und lädt neu ein.
+- Zwei-Faktor-Anmeldung ist freiwillig pro Konto (Empfehlung: für alle Administratoren aktivieren).
+- `SESSION_SECRET` nicht ändern, solange 2FA genutzt wird – das TOTP-Geheimnis ist damit verschlüsselt (sonst müssen alle 2FA neu einrichten; Admin kann per Reset-Link 2FA zurücksetzen).
+- Kein „Passwort vergessen“ per E-Mail (bewusst, kein Mailserver). Ausgleich: Admin erzeugt einen Reset-Link.
 - Der Belegschafts-Code ist ein gemeinsames Geheimnis – kein Ersatz für persönliche Konten.
 - Die IP-Ermittlung für die Ratenbegrenzung ist ohne `TRUST_PROXY=true` hinter einem Proxy ungenau (Limit pro E-Mail greift trotzdem).
 - Viele Beschäftigte teilen sich oft eine Firmen-IP (NAT). Daher: Push-Abo bis 600/Stunde je IP, beim Belegschafts-Code zählen nur Fehlversuche (20/15 min je IP). Werte in `src/lib/services/rate-limit.ts` anpassbar.

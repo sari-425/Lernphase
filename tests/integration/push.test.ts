@@ -11,6 +11,7 @@ import {
   enqueueDispatch,
   enqueueDueScheduled,
   processDispatches,
+  sendTestPush,
   subscribe,
   triggerPush,
   unsubscribe,
@@ -236,5 +237,17 @@ describe("Push-Versand Ende-zu-Ende (echte Verschlüsselung, lokaler Push-Dienst
     // keine IP, kein Name, keine Uhrzeit – nur Tagesdatum
     expect(Object.keys(row)).not.toContain("ip");
     expect(row.lastSeenOn).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it("Test-Push geht nur an genau das angefragte Gerät und meldet abgelaufene Abos", async () => {
+    const mine = await sub("mein-geraet");
+    await sub("anderes-geraet");
+    expect(await sendTestPush(h.db, sender, tenant, mine.endpoint)).toBe(201);
+    expect(svc.received.map((r) => r.path)).toEqual(["/push/mein-geraet"]);
+    expect(JSON.parse(svc.received[0].payload).title).toContain("Test");
+    await expect(sendTestPush(h.db, sender, tenant, "https://push.example/unbekannt")).rejects.toThrow(/nicht angemeldet/);
+    svc.setStatus("mein-geraet", 410);
+    await expect(sendTestPush(h.db, sender, tenant, mine.endpoint)).rejects.toThrow(/neu aktivieren/);
+    expect(await countSubscriptions(h.db, tenant.id)).toBe(1);
   });
 });

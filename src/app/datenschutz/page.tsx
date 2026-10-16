@@ -44,6 +44,7 @@ export default function Datenschutz() {
           <li><strong>Anmeldung</strong> (nur Betriebsratsmitglieder): Sitzungs-Cookie, max. 7 Tage, Abmeldung nach 24 h Inaktivität.</li>
           <li><strong>„Neu“-Markierung</strong>: Zeitpunkt Ihres letzten Besuchs, ausschließlich lokal im Browser (localStorage), wird nie übertragen.</li>
           <li><strong>Service Worker</strong>: speichert nur Programmbestandteile und eine Offline-Seite, keine Mitteilungsinhalte.</li>
+          <li><strong>Umfragen</strong> (nur wenn Sie abstimmen): zufälliger Gerätewert ohne Personenbezug, 12 Monate, damit pro Gerät nur einmal abgestimmt wird.</li>
         </ul>
         <p>Diese Speicherungen sind für die von Ihnen ausdrücklich gewünschten Funktionen unbedingt erforderlich (§ 25 Abs. 2 Nr. 2 TDDDG).</p>
 
@@ -55,15 +56,20 @@ export default function Datenschutz() {
           Rechtsgrundlage: Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO, § 25 Abs. 1 TDDDG), jederzeit widerrufbar über „Benachrichtigungen deaktivieren“ oder die Geräteeinstellungen. Löschung: sofort bei Abmeldung, sobald der Push-Dienst das Abo als ungültig meldet, nach 5 Fehlversuchen oder nach 180 Tagen ohne Aufruf der Einstellungsseite.
         </p>
 
-        <h2>6. Konten von Betriebsratsmitgliedern</h2>
+        <h2>6. Umfragen</h2>
         <p>
-          Für Mitglieder der Redaktion werden Name, E-Mail-Adresse, ein sicherer Passwort-Hash (scrypt), Rolle und ein Änderungsprotokoll (wer hat wann was veröffentlicht; 12 Monate) gespeichert. Löschung beim Entfernen aus dem Team.
+          Umfragen sind anonym. Gespeichert wird nur die gewählte Antwort und – solange die Umfrage läuft – eine nicht umkehrbare Prüfsumme aus dem zufälligen Gerätewert, um Mehrfachabstimmungen vom selben Gerät zu verhindern. Mit Ende der Umfrage wird auch diese Prüfsumme gelöscht; übrig bleibt nur die Anzahl der Stimmen. Name, IP-Adresse oder Zeitpunkt der Stimmabgabe werden nicht gespeichert. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO bzw. § 25 Abs. 2 Nr. 2 TDDDG [prüfen].
         </p>
 
-        <h2>7. Inhalte der Mitteilungen</h2>
+        <h2>7. Konten von Betriebsratsmitgliedern</h2>
+        <p>
+          Für Mitglieder der Redaktion werden Name, E-Mail-Adresse, ein sicherer Passwort-Hash (scrypt), Rolle und ein Änderungsprotokoll (wer hat wann was veröffentlicht; 12 Monate) gespeichert. Bei aktivierter Zwei-Faktor-Anmeldung zusätzlich das verschlüsselte TOTP-Geheimnis und Prüfsummen der Wiederherstellungscodes. Links zum Zurücksetzen des Passworts gelten 24 Stunden und werden spätestens 7 Tage danach gelöscht. Löschung des Kontos beim Entfernen aus dem Team.
+        </p>
+
+        <h2>8. Inhalte der Mitteilungen</h2>
         <p>Mitteilungen werden vom Betriebsrat erstellt. Sie sollen keine personenbezogenen Daten einzelner Beschäftigter enthalten; die Anwendung warnt vor der Veröffentlichung bei entsprechenden Hinweisen.</p>
 
-        <h2>8. Ihre Rechte</h2>
+        <h2>9. Ihre Rechte</h2>
         <p>
           Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch, Datenübertragbarkeit sowie Widerruf erteilter Einwilligungen und Beschwerde bei einer Aufsichtsbehörde [zuständige Behörde eintragen]. Da wir Leserinnen und Leser nicht identifizieren, können wir Daten oft keiner Person zuordnen (Art. 11 DSGVO); Ihr Push-Abo können Sie jederzeit selbst löschen.
         </p>

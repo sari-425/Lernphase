@@ -1,6 +1,7 @@
 import { and, isNotNull, lt, or } from "drizzle-orm";
 import type { DB } from "@/lib/db/client";
-import { invitations } from "@/lib/db/schema";
+import { invitations, passwordResets } from "@/lib/db/schema";
+import { anonymizeEndedPolls } from "./polls";
 import type { PushSender } from "@/lib/push/sender";
 import { purgeExpiredSessions } from "./auth";
 import { purgeAudit } from "./audit";
@@ -17,6 +18,8 @@ const DAY = 24 * 60 * 60_000;
  *  - Push-Abos: nach 180 Tagen ohne Lebenszeichen oder nach 5 Fehlversuchen
  *  - Push-Versandprotokolle (nur Zähler): nach 90 Tagen
  *  - Änderungsprotokoll (Audit): nach 365 Tagen
+ *  - Passwort-Links: 7 Tage nach Ablauf/Verwendung
+ *  - Umfragen: Gerätekennungen der Stimmen werden mit Ende der Umfrage gelöscht
  */
 export async function runRetention(db: DB, now = new Date()) {
   await purgeExpiredSessions(db, now);
@@ -29,10 +32,19 @@ export async function runRetention(db: DB, now = new Date()) {
         and(isNotNull(invitations.usedAt), lt(invitations.usedAt, new Date(now.getTime() - 7 * DAY))),
       ),
     );
+  await db
+    .delete(passwordResets)
+    .where(
+      or(
+        lt(passwordResets.expiresAt, new Date(now.getTime() - 7 * DAY)),
+        and(isNotNull(passwordResets.usedAt), lt(passwordResets.usedAt, new Date(now.getTime() - 7 * DAY))),
+      ),
+    );
+  const anonymizedVotes = await anonymizeEndedPolls(db, now);
   const removedSubs = await purgeSubscriptions(db, now);
   await purgeDispatches(db, new Date(now.getTime() - 90 * DAY));
   await purgeAudit(db, new Date(now.getTime() - 365 * DAY));
-  return { removedSubs };
+  return { removedSubs, anonymizedVotes };
 }
 
 /** Ein Planer-Durchlauf: fällige Pushes anlegen und versenden. */

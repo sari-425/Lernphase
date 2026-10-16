@@ -24,10 +24,11 @@ afterAll(async () => h.close());
 
 describe("Anmeldung und Sitzungen", () => {
   it("meldet mit korrekten Daten an und speichert nur den Hash des Tokens", async () => {
-    const { token } = await login(h.db, SECRET, { email: "ADMIN@auth.test ", password: PW, ip: "10.0.0.1" });
+    const r = await login(h.db, SECRET, { email: "ADMIN@auth.test ", password: PW, ip: "10.0.0.1" });
+    if (r.kind !== "session") throw new Error("erwartet Sitzung");
     const rows = await h.db.select().from(sessions);
-    expect(rows.some((r) => r.idHash === token)).toBe(false);
-    expect((await validateSession(h.db, token))?.email).toBe("admin@auth.test");
+    expect(rows.some((x) => x.idHash === r.token)).toBe(false);
+    expect((await validateSession(h.db, r.token))?.email).toBe("admin@auth.test");
   });
 
   it("gibt bei falschem Passwort und unbekannter E-Mail dieselbe Meldung", async () => {

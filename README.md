@@ -13,6 +13,9 @@ Der Betriebsrat veröffentlicht Mitteilungen – Beschäftigte lesen sie ohne Ko
 | Ansprechpartner | Push gezielt auslösen, neutrale Sperrbildschirm-Texte |
 | Push freiwillig, nach Themen, jederzeit abschaltbar | Team mit Rollen (Admin, Redakteur mit/ohne Veröffentlichungsrecht) |
 | iPhone-Anleitung für Push | Archivieren, Zurückziehen, endgültig Löschen, Änderungsprotokoll |
+| Anonyme Umfragen (Stimmungsbild) | Umfragen anlegen, starten, beenden, Ergebnis |
+| | Zwei-Faktor-Anmeldung, Passwort-Reset-Link, „Mein Konto“ |
+| | Druckbarer Aushang mit QR-Code, Push-Test an das eigene Gerät |
 
 ## Schnellstart auf dem MacBook (ca. 10 Minuten)
 
@@ -70,8 +73,8 @@ Alle Variablen sind in [`.env.example`](.env.example) erklärt. Die wichtigsten:
 ## Tests
 
 ```bash
-npm test             # 76 Unit- & Integrationstests (eingebettete DB, ca. 25 s)
-npm run test:e2e     # 10 Browser-Tests (baut vorher: npm run build); einmalig: npx playwright install chromium
+npm test             # 97 Unit- & Integrationstests (eingebettete DB, ca. 30 s)
+npm run test:e2e     # 13 Browser-Tests (baut vorher: npm run build); einmalig: npx playwright install chromium
 npm run lint && npm run typecheck
 npm run check        # alles zusammen inkl. Build
 
@@ -79,7 +82,7 @@ npm run check        # alles zusammen inkl. Build
 TEST_DATABASE_URL=postgres://localhost:5432/brd_test npm run test:pg
 ```
 
-Was getestet wird: Anmeldung, Sitzungen, Ratenbegrenzung, Rollen, **Mandantentrennung**, Entwurf → Freigabe → Veröffentlichung, Planung, Ablauf/Archiv, Zurückziehen, Löschen, Anhänge, **Push Ende-zu-Ende mit echter Verschlüsselung und VAPID-Prüfung** gegen einen lokalen Push-Dienst, Doppelversand, abgelaufene Abos (404/410), Versandbegrenzung, Löschfristen, Eingabevalidierung, XSS, CSRF, Barrierefreiheit (axe, WCAG 2.2 AA-Regeln).
+Was getestet wird: Anmeldung, Zwei-Faktor (inkl. RFC-6238-Testvektoren), Passwort-Reset, Sitzungen, Ratenbegrenzung, Rollen, **Mandantentrennung**, Entwurf → Freigabe → Veröffentlichung, Planung, Ablauf/Archiv, Zurückziehen, Löschen, Anhänge, **Push Ende-zu-Ende mit echter Verschlüsselung und VAPID-Prüfung** gegen einen lokalen Push-Dienst, Doppelversand, abgelaufene Abos (404/410), Versandbegrenzung, Push-Selbsttest, Umfragen (eine Stimme pro Gerät, Anonymisierung), Löschfristen, Eingabevalidierung, XSS, CSRF, Barrierefreiheit (axe, WCAG 2.2 AA-Regeln).
 Ergebnisse des letzten Laufs: siehe [`docs/TESTBERICHT.md`](docs/TESTBERICHT.md).
 
 ## Dokumentation
@@ -98,12 +101,13 @@ Ergebnisse des letzten Laufs: siehe [`docs/TESTBERICHT.md`](docs/TESTBERICHT.md)
 
 **Fertig und getestet:** siehe Tabelle oben und `docs/TESTBERICHT.md`.
 
-**Offen – braucht Sie / externe Einrichtung:**
-- [ ] Server, Domain und AV-Vertrag (Kosten ca. 5–10 €/Monat, siehe `KOSTEN.md`) – nichts davon wurde registriert.
-- [ ] **Push auf echten Geräten** (Android, iPhone, Desktop) einmal manuell prüfen – die Testumgebung hatte keinen Zugang zu den echten Push-Diensten von Google/Apple (Anleitung in `BETRIEB.md`).
-- [ ] Docker-Image einmal bauen (`docker compose up -d --build`) – in der Entwicklungsumgebung lief kein Docker-Daemon; die Laufzeit des Images (Standalone-Server + automatische Migration) wurde aber geprüft.
-- [ ] Datenschutzerklärung und Impressum vervollständigen und rechtlich prüfen lassen; Rollen nach § 79a BetrVG klären.
-- [ ] Bewusst nicht umgesetzt: Umfragen/Abstimmungen (Begründung in `ARCHITEKTUR.md`), Zwei-Faktor-Anmeldung, E-Mail-Versand.
+**Offen – braucht Sie / externe Einrichtung** (kann ich nicht für Sie erledigen):
+- [ ] Server, Domain und AV-Vertrag (Kosten ca. 5–10 €/Monat, siehe `KOSTEN.md`) – nichts davon wurde registriert. Anleitung: `docs/BETRIEB.md`.
+- [ ] **Push auf echten Geräten** einmal prüfen – nach dem Deployment in der Verwaltung mit „Test-Benachrichtigung an dieses Gerät“ (die Testumgebung hatte keinen Zugang zu den Push-Diensten von Google/Apple).
+- [ ] Datenschutzerklärung und Impressum vervollständigen und rechtlich prüfen lassen; Rollen nach § 79a BetrVG klären (Checkliste: `docs/DATENSCHUTZ.md`).
+- [ ] Lizenz festlegen (siehe unten).
+
+**Bewusst nicht enthalten:** E-Mail-Versand (keine Kosten, kein Dienstleister – Einladungen und Passwort-Reset per Link), native App-Store-Apps (PWA genügt), Wahlen/verbindliche Abstimmungen (Umfragen sind ausdrücklich nur Stimmungsbilder).
 
 ## Lizenz
 Noch festzulegen (Empfehlung für ein Gemeinwohl-Projekt: AGPL-3.0 oder MIT).

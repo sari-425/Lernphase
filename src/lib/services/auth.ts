@@ -71,6 +71,10 @@ export async function purgeExpiredSessions(db: DB, now = new Date()) {
   await db.delete(sessions).where(lt(sessions.lastActiveAt, new Date(now.getTime() - SESSION_IDLE_MS)));
 }
 
+export type LoginResult =
+  | { kind: "session"; token: string; user: SessionUser }
+  | { kind: "second-factor"; user: SessionUser };
+
 /**
  * Anmeldung mit Ratenbegrenzung pro E-Mail und pro (gehashter) IP.
  * Fehlermeldungen verraten nicht, ob ein Konto existiert.
@@ -80,7 +84,7 @@ export async function login(
   secret: string,
   input: { email: string; password: string; ip: string },
   now = new Date(),
-): Promise<{ token: string; user: SessionUser }> {
+): Promise<LoginResult> {
   const email = input.email.trim().toLowerCase();
   const emailKey = limitKey(secret, LIMITS.loginByEmail, email);
   const ipKey = limitKey(secret, LIMITS.loginByIp, input.ip);
@@ -95,8 +99,10 @@ export async function login(
     throw new AppError("UNAUTHENTICATED", "E-Mail-Adresse oder Passwort ist falsch.");
   }
   await clearHits(db, emailKey);
+  const sessionUser = { id: user.id, email: user.email, displayName: user.displayName };
+  if (user.totpEnabled) return { kind: "second-factor", user: sessionUser };
   const token = await createSession(db, user.id, now);
-  return { token, user: { id: user.id, email: user.email, displayName: user.displayName } };
+  return { kind: "session", token, user: sessionUser };
 }
 
 /** Lädt die Rolle eines Benutzers in GENAU einem Mandanten. Kein Eintrag = kein Zugriff. */

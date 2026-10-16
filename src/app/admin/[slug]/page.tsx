@@ -7,6 +7,8 @@ import { countSubscriptions, listDispatches } from "@/lib/services/push";
 import { can } from "@/lib/auth/permissions";
 import { Alert, PageTitle, StatusBadge } from "@/components/ui";
 import { formatDateTime } from "@/lib/time";
+import { PushSelfTest } from "@/components/push-self-test";
+import { testPushAction } from "./actions";
 
 const DISPATCH_LABEL: Record<string, string> = { pending: "wartet", sending: "wird gesendet", done: "übergeben", failed: "fehlgeschlagen", skipped: "verworfen" };
 
@@ -39,6 +41,7 @@ export default async function Dashboard({ params, searchParams }: { params: Prom
       <div className="flex flex-wrap gap-3">
         <Link href={`/admin/${slug}/mitteilungen/neu`} className="btn-primary">+ Neue Mitteilung</Link>
         <Link href={`/admin/${slug}/mitteilungen`} className="btn-secondary">Alle Mitteilungen</Link>
+        <Link href={`/admin/${slug}/aushang`} className="btn-secondary">Aushang mit QR-Code</Link>
       </div>
 
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -57,6 +60,13 @@ export default async function Dashboard({ params, searchParams }: { params: Prom
         ))}
       </dl>
       <p className="-mt-3 text-sm text-muted">„Push-Geräte“ = Anzahl anonymer Abonnements. Wer liest, wird bewusst nicht erfasst.</p>
+
+      {pushReady ? (
+        <section className="card space-y-2">
+          <h2 className="text-lg font-bold">Push auf diesem Gerät testen</h2>
+          <PushSelfTest slug={slug} action={testPushAction.bind(null, slug)} />
+        </section>
+      ) : null}
 
       <section className="card space-y-3">
         <h2 className="text-lg font-bold">Warten auf Freigabe</h2>

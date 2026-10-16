@@ -19,6 +19,7 @@ export function TenantNav({ slug }: { slug: string }) {
     { href: `${base}/mitteilungen`, label: "Aktuell", icon: "aktuell" },
     { href: `${base}/kategorien`, label: "Themen", icon: "themen" },
     { href: `${base}/archiv`, label: "Archiv & Suche", short: "Archiv", icon: "archiv" },
+    { href: `${base}/umfragen`, label: "Umfragen", icon: "themen", desktopOnly: true },
     { href: `${base}/kontakt`, label: "Ansprechpartner", short: "Kontakt", icon: "kontakt" },
     { href: `${base}/benachrichtigungen`, label: "Benachrichtigungen", short: "Push", icon: "push", desktopOnly: true },
   ];
@@ -26,8 +27,8 @@ export function TenantNav({ slug }: { slug: string }) {
   return (
     <>
       {/* Desktop */}
-      <nav aria-label="Hauptnavigation" className="hidden border-b border-slate-200 bg-white md:block">
-        <ul className="mx-auto flex max-w-5xl gap-1 px-4">
+      <nav aria-label="Hauptnavigation" className="hidden overflow-x-auto border-b border-slate-200 bg-white md:block">
+        <ul className="mx-auto flex max-w-5xl gap-1 px-4 whitespace-nowrap">
           {items.map((it) => (
             <li key={it.href}>
               <Link
