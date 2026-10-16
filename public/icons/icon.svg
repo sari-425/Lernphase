@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><rect width="400" height="400" rx="72" fill="#111111"/><g transform="translate(24 16) scale(0.88)">    <g>
+      <path d="M58 330 V92 Q58 50 100 50 H300 Q342 50 342 92 V330" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" />
+      <circle cx="126" cy="116" r="25" fill="#ffffff" />
+      <circle cx="274" cy="116" r="25" fill="#ffffff" />
+      <path d="M90 178 Q90 150 118 150 H134 Q162 150 162 178 V232 H90 Z" fill="#ffffff" />
+      <path d="M238 178 Q238 150 266 150 H282 Q310 150 310 178 V232 H238 Z" fill="#ffffff" />
+      <circle cx="200" cy="96" r="32" fill="#ffffff" stroke="#111111" stroke-width="8" paint-order="stroke" />
+      <path d="M148 180 Q148 142 186 142 H214 Q252 142 252 180 V228 H148 Z" fill="#ffffff" stroke="#111111" stroke-width="9" stroke-linejoin="round" paint-order="stroke" />
+      <path d="M146 234 Q174 226 200 238 Q226 226 254 234 V246 Q226 238 200 250 Q174 238 146 246 Z" fill="#ffffff" />
+      <g fill="none" stroke="#ffffff" stroke-width="28">
+        <path d="M94 252 V378" />
+        <path d="M94 266 H150 A23.5 23.5 0 0 1 150 313 H94" />
+        <path d="M94 313 H156 A25.5 25.5 0 0 1 156 364 H94" />
+        <path d="M226 252 V378" />
+        <path d="M226 266 H284 A23.5 23.5 0 0 1 284 313 H226" />
+        <path d="M268 313 L316 378" />
+      </g>
+    </g></g></svg>

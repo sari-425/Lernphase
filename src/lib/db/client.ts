@@ -11,7 +11,7 @@ export interface DbHandle {
   close: () => Promise<void>;
 }
 
-const MIGRATIONS_DIR = path.join(process.cwd(), "drizzle");
+const MIGRATIONS_DIR = path.join(/*turbopackIgnore: true*/ process.cwd(), "drizzle");
 
 /**
  * Erstellt eine Datenbankverbindung.
@@ -35,7 +35,7 @@ export async function createDb(url: string): Promise<DbHandle> {
     if (target === "memory" || target === "") {
       client = new PGlite();
     } else {
-      const dir = path.resolve(process.cwd(), target);
+      const dir = path.resolve(/*turbopackIgnore: true*/ process.cwd(), target);
       fs.mkdirSync(dir, { recursive: true });
       client = new PGlite(dir);
     }

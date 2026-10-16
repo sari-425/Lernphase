@@ -18,6 +18,7 @@ describe("Sicheres Textformat", () => {
   });
   it("kürzt Anreißer", () => {
     expect(excerpt("**Hallo** Welt", 100)).toBe("Hallo Welt");
+    expect(excerpt("## Tagesordnung\n- Bericht\n- Fragen", 100)).toBe("Tagesordnung · Bericht · Fragen");
     expect(excerpt("x".repeat(300), 50)).toHaveLength(50);
   });
 });

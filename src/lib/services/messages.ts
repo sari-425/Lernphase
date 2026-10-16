@@ -10,7 +10,7 @@ import {
   type Visibility,
 } from "@/lib/db/schema";
 import { assertCan, can, type Actor } from "@/lib/auth/permissions";
-import { AppError, forbidden, invalid, notFound } from "@/lib/errors";
+import { AppError, invalid, notFound } from "@/lib/errors";
 import { checkSensitive } from "@/lib/content/sensitive-check";
 import type { MessageInput } from "@/lib/validation/schemas";
 import { audit } from "./audit";

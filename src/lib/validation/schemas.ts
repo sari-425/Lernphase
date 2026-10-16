@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { parseBerlinLocal } from "@/lib/time";
 
 const trimmed = (max: number) => z.string().trim().max(max, `Höchstens ${max} Zeichen.`);
 
@@ -35,8 +36,9 @@ const optionalDate = z
   .optional()
   .transform((v, ctx) => {
     if (!v) return null;
-    const d = new Date(v);
-    if (Number.isNaN(d.getTime())) {
+    // Eingabe aus <input type="datetime-local"> = deutsche Ortszeit; ISO-Zeitstempel mit Zone ebenfalls erlaubt
+    const d = /[zZ]|[+-]\d{2}:\d{2}$/.test(v) ? new Date(v) : parseBerlinLocal(v);
+    if (!d || Number.isNaN(d.getTime())) {
       ctx.addIssue({ code: "custom", message: "Ungültiges Datum." });
       return z.NEVER;
     }

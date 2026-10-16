@@ -18,6 +18,7 @@ const schema = z.object({
   VAPID_PRIVATE_KEY: z.string().optional(),
   VAPID_SUBJECT: z.string().optional(),
   SETUP_TOKEN: z.string().optional(),
+  DEFAULT_TENANT_SLUG: z.string().optional(),
   CRON_SECRET: z.string().optional(),
   ENABLE_INTERNAL_SCHEDULER: boolish.optional(),
   AUTO_MIGRATE: boolish.optional(),

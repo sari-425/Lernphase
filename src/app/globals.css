@@ -1,26 +1,92 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand-50: #eef3fa;
+  --color-brand-100: #dbe5f3;
+  --color-brand-200: #b6cae6;
+  --color-brand-600: #24467a;
+  --color-brand-700: #1b3863;
+  --color-brand-800: #142c50;
+  --color-brand-900: #0e1f3a;
+  --color-accent-600: #0f766e;
+  --color-accent-50: #ecfdf8;
+  --color-ink: #16202e;
+  --color-muted: #4b5563;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  --logo-bg: #111111;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  /* etwas größere Grundschrift für gute Lesbarkeit */
+  font-size: 106.25%;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  line-height: 1.55;
+}
+
+/* deutlich sichtbarer Tastaturfokus (WCAG 2.4.7 / 2.4.11) */
+:focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@utility btn {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2 text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60;
+}
+
+@utility btn-primary {
+  @apply btn bg-brand-700 text-white hover:bg-brand-800;
+}
+
+@utility btn-secondary {
+  @apply btn border border-brand-200 bg-white text-brand-800 hover:bg-brand-50;
+}
+
+@utility btn-danger {
+  @apply btn border border-red-300 bg-white text-red-800 hover:bg-red-50;
+}
+
+@utility btn-ghost {
+  @apply btn text-brand-800 hover:bg-brand-50;
+}
+
+@utility card {
+  @apply rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5;
+}
+
+@utility input {
+  @apply block w-full min-h-11 rounded-lg border border-slate-400 bg-white px-3 py-2 text-base text-ink placeholder:text-slate-500 focus:border-brand-600;
+}
+
+@utility label {
+  @apply mb-1 block font-semibold text-ink;
+}
+
+@utility hint {
+  @apply mt-1 text-sm text-muted;
+}
+
+@utility link {
+  @apply font-medium text-brand-700 underline underline-offset-2 hover:text-brand-900;
 }

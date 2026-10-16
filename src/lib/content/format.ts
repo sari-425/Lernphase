@@ -80,9 +80,11 @@ export function parseBody(body: string): Block[] {
 /** Kurzer Anreißertext ohne Formatierungszeichen. */
 export function excerpt(body: string, max = 180): string {
   const plain = body
-    .replace(/^#{1,3}\s+/gm, "")
-    .replace(/^\s*[-*•]\s+/gm, "")
-    .replace(/\*\*/g, "")
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .map((l) => l.replace(/^#{1,3}\s+/, "").replace(/^\s*[-*•]\s+/, "").replace(/\*\*/g, "").trim())
+    .filter(Boolean)
+    .join(" · ")
     .replace(/\s+/g, " ")
     .trim();
   return plain.length > max ? plain.slice(0, max - 1).trimEnd() + "…" : plain;
