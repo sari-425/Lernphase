@@ -87,6 +87,25 @@ export async function updateTenantSettings(
   await audit(db, actor, "settings.update");
 }
 
+/** Angaben für Impressum und Datenschutzerklärung dieses Betriebsrats. */
+export async function updateLegalTexts(
+  db: DB,
+  actor: Actor,
+  input: {
+    imprintText: string;
+    privacyController: string;
+    privacyCouncilContact: string;
+    privacyDpo: string;
+    privacyAuthority: string;
+    privacyHosting: string;
+  },
+  now = new Date(),
+) {
+  assertCan(actor, "settings.manage");
+  await db.update(tenants).set({ ...input, legalUpdatedAt: now }).where(eq(tenants.id, actor.tenantId));
+  await audit(db, actor, "legal.update");
+}
+
 // ---------- Belegschafts-Zugang ----------
 
 /**

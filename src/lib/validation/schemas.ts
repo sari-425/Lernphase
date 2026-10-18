@@ -128,6 +128,16 @@ export const tenantSettingsSchema = z.object({
   welcomeText: trimmed(1000).default(""),
 });
 
+export const legalTextsSchema = z.object({
+  imprintText: trimmed(3000).default(""),
+  privacyController: trimmed(1000).default(""),
+  privacyCouncilContact: trimmed(1000).default(""),
+  privacyDpo: trimmed(1000).default(""),
+  privacyAuthority: trimmed(1000).default(""),
+  privacyHosting: trimmed(1000).default(""),
+});
+export type LegalTextsInput = z.infer<typeof legalTextsSchema>;
+
 export const setupSchema = z.object({
   token: z.string().default(""),
   tenantName: trimmed(120).min(3, "Bitte den Namen des Betriebsrats angeben."),

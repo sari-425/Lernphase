@@ -15,6 +15,13 @@
       "when": 1792156511357,
       "tag": "0001_features",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792337984096,
+      "tag": "0002_legal",
+      "breakpoints": true
     }
   ]
 }

@@ -44,7 +44,7 @@ export default async function TenantLayout({ children, params }: Props) {
         {children}
       </main>
       <footer className="border-t border-slate-200 bg-white px-4 pt-5 pb-24 text-center text-sm text-muted md:pb-5">
-        <Link href="/datenschutz" className="link">Datenschutz</Link> · <Link href="/impressum" className="link">Impressum</Link> ·{" "}
+        <Link href={`/b/${slug}/datenschutz`} className="link">Datenschutz</Link> · <Link href={`/b/${slug}/impressum`} className="link">Impressum</Link> ·{" "}
         {access.member ? (
           <Link href={`/admin/${slug}`} className="link">Verwaltung</Link>
         ) : (

@@ -73,6 +73,33 @@ test("Öffentliche Startseite ohne Konto, leere Zustände und Barrierefreiheit",
   await expect(page.getByText("Unter dieser Kurzadresse wurde kein Betriebsrat gefunden.")).toBeVisible();
 });
 
+test("Impressum und Datenschutz: Angaben in den Einstellungen, öffentlich sichtbar", async ({ page }) => {
+  await page.goto(`/b/${SLUG}/impressum`);
+  await expect(page.getByText("Angaben unvollständig")).toBeVisible();
+  await page.goto("/datenschutz");
+  await expect(page.getByRole("heading", { name: "Datenschutzerklärung" })).toBeVisible();
+
+  await admin.goto(`/admin/${SLUG}/einstellungen`);
+  await admin.getByLabel("Impressum", { exact: true }).fill("Betriebsrat der E2E GmbH\nTeststraße 1, 12345 Teststadt");
+  await admin.getByLabel("Verantwortlicher (Datenschutz)").fill("E2E GmbH, Teststraße 1");
+  await admin.getByLabel("Hosting-Anbieter").fill("Test-Hoster GmbH, Deutschland");
+  await admin.getByLabel("Zuständige Aufsichtsbehörde").fill("Aufsichtsbehörde Test, https://example.org");
+  await admin.getByRole("button", { name: "Angaben speichern" }).click();
+  await expect(admin.getByText("Angaben für Impressum und Datenschutz gespeichert.")).toBeVisible();
+
+  await page.goto(`/b/${SLUG}`);
+  await page.getByRole("contentinfo").getByRole("link", { name: "Impressum" }).click();
+  await expect(page).toHaveURL(new RegExp(`/b/${SLUG}/impressum$`));
+  await expect(page.getByText("Teststraße 1, 12345 Teststadt")).toBeVisible();
+  await expect(page.getByText("Angaben unvollständig")).toHaveCount(0);
+  await expectNoA11yViolations(page, "Impressum");
+  await page.goto(`/b/${SLUG}/datenschutz`);
+  await expect(page.getByText("Test-Hoster GmbH, Deutschland")).toBeVisible();
+  await expect(page.getByRole("link", { name: "https://example.org" })).toBeVisible();
+  await expect(page.getByText("Angaben unvollständig")).toHaveCount(0);
+  await expectNoA11yViolations(page, "Datenschutz");
+});
+
 test("Verwaltung ist ohne Anmeldung nicht erreichbar", async ({ page }) => {
   await page.goto(`/admin/${SLUG}/mitteilungen/neu`);
   await expect(page).toHaveURL(/\/login$/);

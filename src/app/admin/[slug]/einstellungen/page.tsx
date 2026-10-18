@@ -4,8 +4,9 @@ import { env } from "@/lib/env";
 import { GenericForm } from "@/components/action-forms";
 import { NoPermission } from "@/components/no-permission";
 import { BrandPanel } from "@/components/logo";
-import { PageTitle } from "@/components/ui";
-import { settingsAction, staffCodeAction } from "../actions";
+import { Alert, PageTitle } from "@/components/ui";
+import { legalIncomplete } from "@/lib/content/legal";
+import { legalTextsAction, settingsAction, staffCodeAction } from "../actions";
 
 export const metadata = { title: "Einstellungen" };
 
@@ -47,6 +48,42 @@ export default async function SettingsPage({ params }: { params: Promise<{ slug:
         </section>
         <div><BrandPanel companyName={tenant.companyName} slogan={tenant.slogan} sloganSub={tenant.sloganSub} /></div>
       </div>
+      <section className="card space-y-3" aria-labelledby="rechtliches">
+        <h2 id="rechtliches" className="text-lg font-bold">Impressum und Datenschutz</h2>
+        <p className="text-sm text-muted">
+          Diese Angaben erscheinen öffentlich im <a className="link" href={`/b/${slug}/impressum`}>Impressum</a> und in der{" "}
+          <a className="link" href={`/b/${slug}/datenschutz`}>Datenschutzerklärung</a>. Der übrige Text der Datenschutzerklärung beschreibt die App und ist bereits vorhanden.
+          Gespeichert wird nur in der Datenbank dieses Servers. Mehrere Zeilen und Links (https://…) sind möglich. Bitte rechtlich prüfen lassen (z. B. durch die/den Datenschutzbeauftragte/n).
+        </p>
+        {legalIncomplete(tenant, "imprint") || legalIncomplete(tenant, "privacy") ? (
+          <Alert kind="warning" title="Noch unvollständig">Impressum, Verantwortlicher, Hosting und Aufsichtsbehörde sollten ausgefüllt sein, bevor die App im Betrieb bekanntgegeben wird.</Alert>
+        ) : null}
+        <GenericForm action={legalTextsAction.bind(null, slug)} submit="Angaben speichern">
+          {[
+            ["imprintText", "Impressum", tenant.imprintText, 3000, 6, "Wer bietet die Seite an? Name bzw. Bezeichnung, Anschrift, E-Mail, ggf. Telefon.", "Betriebsrat der Muster GmbH\nVorsitzende/r: Vorname Name\nMusterstraße 1, 12345 Musterstadt\nE-Mail: betriebsrat@example.org"],
+            ["privacyController", "Verantwortlicher (Datenschutz)", tenant.privacyController, 1000, 4, "In der Regel der Arbeitgeber (§ 79a BetrVG): Firma, Anschrift, Kontakt.", "Muster GmbH\nMusterstraße 1, 12345 Musterstadt\nE-Mail: info@example.org"],
+            ["privacyCouncilContact", "Kontakt des Betriebsrats", tenant.privacyCouncilContact, 1000, 3, "Inhaltlich verantwortlich für die Mitteilungen.", "Betriebsrat der Muster GmbH, Musterstraße 1, 12345 Musterstadt, betriebsrat@example.org"],
+            ["privacyDpo", "Datenschutzbeauftragte/r (falls vorhanden)", tenant.privacyDpo, 1000, 3, "Name oder Funktion und Kontakt.", "Datenschutzbeauftragte/r der Muster GmbH, datenschutz@example.org"],
+            ["privacyHosting", "Hosting-Anbieter", tenant.privacyHosting, 1000, 3, "Wo läuft der Server? Mit dem Anbieter muss ein Auftragsverarbeitungsvertrag bestehen.", "Name des Anbieters, Anschrift; Serverstandort Deutschland"],
+            ["privacyAuthority", "Zuständige Aufsichtsbehörde", tenant.privacyAuthority, 1000, 3, "Datenschutz-Aufsichtsbehörde des Bundeslands, in dem der Verantwortliche sitzt.", "Name der Behörde, Anschrift, Website"],
+          ].map(([n, l, v, max, rows, hint, ph]) => (
+            <div key={n as string}>
+              <label htmlFor={n as string} className="label">{l}</label>
+              <p id={`${n}-hint`} className="hint -mt-1 mb-1">{hint}</p>
+              <textarea
+                id={n as string}
+                name={n as string}
+                rows={rows as number}
+                maxLength={max as number}
+                defaultValue={v as string}
+                placeholder={ph as string}
+                aria-describedby={`${n}-hint`}
+                className="input"
+              />
+            </div>
+          ))}
+        </GenericForm>
+      </section>
       <section className="card space-y-3">
         <h2 className="text-lg font-bold">Belegschafts-Zugangscode</h2>
         <p className="text-sm text-muted">

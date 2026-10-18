@@ -62,8 +62,8 @@
 
 - [ ] Verantwortlichkeit klären (§ 79a BetrVG), Datenschutzbeauftragte/n einbinden
 - [ ] **AV-Vertrag** mit dem Hoster abschließen (Serverstandort EU/Deutschland wählen)
-- [ ] Datenschutzerklärung (`/datenschutz`, Entwurf) vervollständigen und prüfen lassen
-- [ ] Impressum (`/impressum`) ausfüllen, Pflicht prüfen
+- [ ] In der Verwaltung unter **Einstellungen → Impressum und Datenschutz** Impressum, Verantwortlichen, Kontakt des Betriebsrats, Datenschutzbeauftragte/n, Hosting-Anbieter und Aufsichtsbehörde eintragen (öffentlich unter `/b/<kurzadresse>/impressum` und `/b/<kurzadresse>/datenschutz`; gespeichert nur in der Datenbank, nicht im Code)
+- [ ] Datenschutzerklärung insgesamt prüfen lassen (allgemeiner Teil in `src/components/legal.tsx`)
 - [ ] Eintrag im **Verzeichnis von Verarbeitungstätigkeiten** (Art. 30 DSGVO)
 - [ ] Prüfen, ob eine **DSFA** (Art. 35) nötig ist (vermutlich nicht, da keine Überwachung/Profilbildung – dokumentieren)
 - [ ] Drittlandübermittlung durch Push-Dienste bewerten (EU-US DPF) und in der Erklärung nennen

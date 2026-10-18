@@ -2,6 +2,8 @@
 
 Lauf vom **16.10.2026** (zweiter Durchgang nach Fertigstellung aller Funktionen) in der Entwicklungsumgebung (Linux, Node.js 22.22, PostgreSQL 16.15, Chromium/Playwright 1.64). Ergebnisse unverändert übernommen.
 
+**Nachtrag 18.10.2026** (Impressum- und Datenschutz-Angaben in den Einstellungen): `npm run check` grün – Lint, Typprüfung, **102 / 102** Unit- + Integrationstests (12 Dateien, eingebettete DB), Build; E2E **13 bestanden**, 1 übersprungen (echter Push, siehe unten). `npm run test:pg` und der Docker-Stack wurden für diesen Nachtrag nicht erneut ausgeführt; die Tabelle unten zeigt den Lauf vom 16.10.
+
 | Prüfung | Befehl | Ergebnis |
 |---|---|---|
 | Lint (ESLint) | `npm run lint` | ✅ 0 Fehler, 0 Warnungen |
@@ -33,11 +35,13 @@ Lauf vom **16.10.2026** (zweiter Durchgang nach Fertigstellung aller Funktionen)
 | `tests/integration/account.test.ts` | 9 | 2FA einrichten/anmelden/sperren/ausschalten, Passwort ändern, andere Geräte abmelden, Reset-Link (einmalig, Rechte, keine Übernahme über Mandantengrenzen) |
 | `tests/integration/polls.test.ts` | 6 | Validierung, Entwürfe unsichtbar, Rechte, eine Stimme pro Gerät, Belegschafts-Zugang, öffentliche Bestätigung, Anonymisierung bei Ende/Ablauf, Mandantentrennung |
 | `tests/integration/auth-retention.test.ts` | 7 | Anmeldung, Token-Hashing, gleiche Fehlermeldungen, Sperre nach 5 Fehlversuchen, HMAC statt Klartext, Sitzungsablauf, Löschfristen, Konto-Löschung, Mandanten-Löschung |
-| `e2e/main.spec.ts` | 13 | siehe unten |
+| `tests/integration/legal.test.ts` | 4 | Impressum-/Datenschutz-Angaben: nur Admin, nur eigener Betriebsrat, Vollständigkeitsprüfung, Längenbegrenzung |
+| `e2e/main.spec.ts` | 14 | siehe unten |
 
 ## E2E-Abläufe
 1. ✅ Ersteinrichtung (falsches Token abgelehnt, Eingaben bleiben erhalten)
 2. ✅ Startseite ohne Konto, „Betriebsrat finden“, **axe-Prüfung WCAG 2.2 AA ohne schwere Verstöße**
+2a. ✅ Impressum/Datenschutz: Hinweis „unvollständig“, Angaben in den Einstellungen speichern, öffentlich sichtbar (Link aus der Fußzeile, Links klickbar), axe-Prüfung
 3. ✅ Verwaltung ohne Anmeldung → Login; falsches Passwort
 4. ✅ Öffentliche Mitteilung: Entwurf unsichtbar (404) → Vorschau → Pflichtbestätigung → sichtbar; XSS als Text; Suche; axe-Prüfung
 5. ✅ Belegschafts-Code (falsch/richtig), Gremiums-Inhalt bleibt auch mit Code unsichtbar

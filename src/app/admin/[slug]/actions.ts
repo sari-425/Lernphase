@@ -13,7 +13,7 @@ import { getDb } from "@/lib/db";
 import { requireActor, setFlash } from "@/lib/server/context";
 import { toActionState, type ActionState } from "@/lib/server/action-result";
 import { processNow } from "@/lib/server/push-runtime";
-import { categorySchema, contactSchema, messageInputSchema, staffCodeSchema, tenantSettingsSchema } from "@/lib/validation/schemas";
+import { categorySchema, contactSchema, legalTextsSchema, messageInputSchema, staffCodeSchema, tenantSettingsSchema } from "@/lib/validation/schemas";
 import {
   addAttachment,
   archiveMessage,
@@ -36,6 +36,7 @@ import {
   revokeInvitation,
   setStaffAccessCode,
   updateMember,
+  updateLegalTexts,
   updateTenantSettings,
 } from "@/lib/services/tenants";
 import {
@@ -247,6 +248,19 @@ export async function settingsAction(slug: string, _prev: ActionState, fd: FormD
   }
   revalidatePath(`/b/${slug}`, "layout");
   return { ok: true, notice: "Einstellungen gespeichert." };
+}
+
+export async function legalTextsAction(slug: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
+  try {
+    const { actor } = await requireActor(slug);
+    const input = legalTextsSchema.parse(Object.fromEntries(fd));
+    await updateLegalTexts(await getDb(), actor, input);
+  } catch (err) {
+    return toActionState(err);
+  }
+  revalidatePath(`/b/${slug}`, "layout");
+  revalidatePath(`/admin/${slug}/einstellungen`);
+  return { ok: true, notice: "Angaben für Impressum und Datenschutz gespeichert." };
 }
 
 export async function staffCodeAction(slug: string, _prev: ActionState, fd: FormData): Promise<ActionState> {

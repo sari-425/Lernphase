@@ -84,8 +84,8 @@ Alle Variablen sind in [`.env.example`](.env.example) erklärt. Die wichtigsten:
 ## Tests
 
 ```bash
-npm test             # 97 Unit- & Integrationstests (eingebettete DB, ca. 30 s)
-npm run test:e2e     # 13 Browser-Tests (baut vorher: npm run build); einmalig: npx playwright install chromium
+npm test             # 102 Unit- & Integrationstests (eingebettete DB, ca. 30 s)
+npm run test:e2e     # 14 Browser-Tests (baut vorher: npm run build); einmalig: npx playwright install chromium
 npm run lint && npm run typecheck
 npm run check        # alles zusammen inkl. Build
 
@@ -106,7 +106,7 @@ Ergebnisse des letzten Laufs: siehe [`docs/TESTBERICHT.md`](docs/TESTBERICHT.md)
 | [docs/SICHERHEIT.md](docs/SICHERHEIT.md) | Sicherheitsmaßnahmen und -checkliste |
 | [docs/BETRIEB.md](docs/BETRIEB.md) | Server, Domain, HTTPS, Push-Test auf Geräten, Backups, Updates |
 | [docs/TESTBERICHT.md](docs/TESTBERICHT.md) | tatsächliche Testergebnisse |
-| `/datenschutz` in der App | Entwurf der Datenschutzerklärung |
+| `/b/<kurzadresse>/datenschutz` und `/impressum` | Datenschutzerklärung und Impressum; Angaben des Betreibers in der Verwaltung unter „Einstellungen“ |
 
 ## Status: Was ist fertig, was ist offen?
 
@@ -115,7 +115,7 @@ Ergebnisse des letzten Laufs: siehe [`docs/TESTBERICHT.md`](docs/TESTBERICHT.md)
 **Offen – braucht Sie / externe Einrichtung** (kann ich nicht für Sie erledigen):
 - [ ] Server, Domain und AV-Vertrag (Kosten ca. 5–10 €/Monat, siehe `KOSTEN.md`) – nichts davon wurde registriert. Anleitung: `docs/BETRIEB.md`.
 - [ ] **Push auf echten Geräten** einmal prüfen – nach dem Deployment in der Verwaltung mit „Test-Benachrichtigung an dieses Gerät“ (die Testumgebung hatte keinen Zugang zu den Push-Diensten von Google/Apple).
-- [ ] Datenschutzerklärung und Impressum vervollständigen und rechtlich prüfen lassen; Rollen nach § 79a BetrVG klären (Checkliste: `docs/DATENSCHUTZ.md`).
+- [ ] Impressum und Datenschutz-Angaben in der Verwaltung unter „Einstellungen“ eintragen und rechtlich prüfen lassen; Rollen nach § 79a BetrVG klären (Checkliste: `docs/DATENSCHUTZ.md`).
 - [ ] Lizenz festlegen (siehe unten).
 
 **Bewusst nicht enthalten:** E-Mail-Versand (keine Kosten, kein Dienstleister – Einladungen und Passwort-Reset per Link), native App-Store-Apps (PWA genügt), Wahlen/verbindliche Abstimmungen (Umfragen sind ausdrücklich nur Stimmungsbilder).
