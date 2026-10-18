@@ -25,7 +25,6 @@ Der Betriebsrat veröffentlicht Mitteilungen – Beschäftigte lesen sie ohne Ko
 # 1. Code holen (oder als ZIP von GitHub herunterladen)
 git clone https://github.com/sari-425/Lernphase.git betriebsrat-direkt
 cd betriebsrat-direkt
-git checkout claude/betriebsrat-direkt   # bis die Änderungen in den Hauptzweig übernommen sind
 
 # 2. Abhängigkeiten installieren
 npm install

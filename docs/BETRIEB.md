@@ -10,7 +10,9 @@ Ergebnis: `https://ihre-domain.de` mit automatischem HTTPS, PostgreSQL, täglich
 3. Optional: **GitHub** für Code und automatische Tests (vorhanden: `sari-425/Lernphase`).
 
 ### Schritt für Schritt
-1. **DNS:** Beim Domain-Anbieter einen `A`-Eintrag `betriebsrat.ihre-domain.de → <IP des Servers>` anlegen (ggf. auch `AAAA` für IPv6).
+1. **Adresse:**
+   - **Ohne eigene Domain (Probebetrieb, kostenlos):** `<IP mit Bindestrichen>.sslip.io`, z. B. Server-IP `203.0.113.5` → `203-0-113-5.sslip.io`. Nichts einzurichten; HTTPS funktioniert trotzdem (Let's Encrypt). Ein späterer Wechsel auf eine eigene Domain ist möglich, Beschäftigte müssen dann aber Push neu aktivieren und das Home-Bildschirm-Symbol neu anlegen.
+   - **Mit eigener Domain:** Beim Domain-Anbieter einen `A`-Eintrag `betriebsrat.ihre-domain.de → <IP des Servers>` anlegen (ggf. auch `AAAA` für IPv6).
 2. **Server vorbereiten** (per SSH als root):
    ```bash
    apt update && apt -y upgrade && apt -y install docker.io docker-compose-v2 git unattended-upgrades ufw
@@ -25,7 +27,7 @@ Ergebnis: `https://ihre-domain.de` mit automatischem HTTPS, PostgreSQL, täglich
    cp .env.example .env
    docker run --rm -v "$PWD":/app -w /app node:22-alpine sh -c "npm ci --ignore-scripts >/dev/null && npx tsx scripts/generate-secrets.mts"
    ```
-   Ausgabe in `.env` übernehmen. Zusätzlich setzen: `POSTGRES_PASSWORD` (langes Zufallspasswort), `DOMAIN=betriebsrat.ihre-domain.de`, `APP_URL=https://betriebsrat.ihre-domain.de`, `VAPID_SUBJECT=mailto:…`, `TRUST_PROXY=true`.
+   Ausgabe in `.env` übernehmen. Zusätzlich setzen: `POSTGRES_PASSWORD` (langes Zufallspasswort), `DOMAIN=…` und `APP_URL=https://…` (Adresse aus Schritt 1, z. B. `203-0-113-5.sslip.io`), `VAPID_SUBJECT=mailto:…`, `TRUST_PROXY=true`.
    ```bash
    chmod 600 .env
    ```
