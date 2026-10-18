@@ -3,7 +3,7 @@
  * einfacher Offline-Hinweis. Inhalte werden bewusst NICHT zwischengespeichert,
  * damit vertrauliche Mitteilungen nicht im Gerätespeicher liegen bleiben.
  */
-const VERSION = "brd-v1";
+const VERSION = "brd-v2";
 const OFFLINE_URL = "/offline";
 const STATIC_CACHE = `${VERSION}-static`;
 

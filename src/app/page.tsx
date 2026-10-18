@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { BrandPanel } from "@/components/logo";
-import { ServiceWorkerRegister } from "@/components/sw-register";
 import { env } from "@/lib/env";
 import { getDb } from "@/lib/db";
 import { countTenants } from "@/lib/services/tenants";
@@ -43,7 +42,6 @@ export default async function Landing({ searchParams }: { searchParams: Promise<
       <footer className="mt-12 text-center text-sm text-muted">
         <Link href="/datenschutz" className="link">Datenschutz</Link> · <Link href="/impressum" className="link">Impressum</Link>
       </footer>
-      <ServiceWorkerRegister />
     </main>
   );
 }

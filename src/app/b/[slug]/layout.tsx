@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LogoMark } from "@/components/logo";
 import { TenantNav, BellLink } from "@/components/tenant-nav";
-import { ServiceWorkerRegister } from "@/components/sw-register";
 import { loadTenant, readerAccess } from "@/lib/server/context";
 
 type Props = { children: React.ReactNode; params: Promise<{ slug: string }> };
@@ -47,7 +46,6 @@ export default async function TenantLayout({ children, params }: Props) {
       <footer className="hidden border-t border-slate-200 bg-white py-5 text-center text-sm text-muted md:block">
         <Link href="/datenschutz" className="link">Datenschutz</Link> · <Link href="/impressum" className="link">Impressum</Link> · Keine Werbung, kein Tracking.
       </footer>
-      <ServiceWorkerRegister />
     </div>
   );
 }

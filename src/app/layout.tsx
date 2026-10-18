@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import "./globals.css";
+import { ServiceWorkerRegister } from "@/components/sw-register";
 
 export const metadata: Metadata = {
   title: { default: "Betriebsrat Direkt", template: "%s · Betriebsrat Direkt" },
@@ -28,6 +29,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           Zum Inhalt springen
         </a>
         {children}
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
