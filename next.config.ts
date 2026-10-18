@@ -22,6 +22,11 @@ const nextConfig: NextConfig = {
   cacheComponents: false,
   output: "standalone",
   poweredByHeader: false,
+  // Das Next.js-Symbol im Entwicklungsmodus verdeckt auf dem Handy die untere Navigation
+  devIndicators: false,
+  // Nur für "npm run dev": Aufruf vom Handy im selben WLAN erlauben
+  // (private Netzadressen und Mac-Gerätenamen wie "MacBook.local").
+  allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "172.*.*.*", "*.local"],
   serverExternalPackages: ["@electric-sql/pglite", "pg", "web-push"],
   experimental: {
     serverActions: {

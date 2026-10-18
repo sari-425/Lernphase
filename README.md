@@ -47,6 +47,14 @@ Die Daten liegen im Ordner `.data/` (eingebettete PostgreSQL-Datenbank „PGlite
 
 > Die eingebettete Datenbank kann nur von **einem** Prozess gleichzeitig genutzt werden. Für die CLI-Werkzeuge parallel zum Server oder für den Dauerbetrieb echte PostgreSQL verwenden – z. B. die kostenlose [Postgres.app](https://postgresapp.com) für macOS: installieren, starten, `createdb betriebsrat` und in `.env.local` `DATABASE_URL=postgres://IHR_BENUTZERNAME@localhost:5432/betriebsrat` eintragen.
 
+### Auf dem Handy ansehen (gleiches WLAN)
+1. Mac und Handy im selben WLAN, `npm run dev` läuft.
+2. IP-Adresse des Macs herausfinden (neues Terminal-Fenster): `ipconfig getifaddr en0` → z. B. `192.168.178.23`.
+3. Auf dem Handy im Browser öffnen: `http://192.168.178.23:3000` (eigene Adresse einsetzen).
+4. Fragt der Mac „Eingehende Verbindungen für node erlauben?“ → **Erlauben**.
+
+Hinweis: Push-Benachrichtigungen und „Zum Home-Bildschirm“ als App funktionieren auf dem Handy erst mit HTTPS, also auf einem echten Server.
+
 ### Produktionsmodus lokal testen
 ```bash
 npm run build

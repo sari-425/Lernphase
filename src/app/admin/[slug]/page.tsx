@@ -34,7 +34,7 @@ export default async function Dashboard({ params, searchParams }: { params: Prom
       ) : null}
       {!pushReady ? (
         <Alert kind="warning" title="Push-Benachrichtigungen sind noch nicht eingerichtet">
-          Der Server-Betreiber muss VAPID-Schlüssel hinterlegen (siehe Anleitung „npm run push:keys“). Mitteilungen können trotzdem veröffentlicht werden.
+          Der Server-Betreiber muss VAPID-Schlüssel hinterlegen (Befehl „npm run secrets“, siehe docs/BETRIEB.md). Mitteilungen können trotzdem veröffentlicht werden.
         </Alert>
       ) : null}
 

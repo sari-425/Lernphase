@@ -32,6 +32,9 @@ export function ActionForm({
     <PendingContext value={pending}>
       <form
         ref={ref}
+        // Sicherheitsnetz: Falls JavaScript (noch) nicht läuft, darf der Browser die
+        // Eingaben (z. B. Passwörter) niemals per GET in die Adresszeile schreiben.
+        method="post"
         className={className}
         noValidate={noValidate}
         onSubmit={(e) => {
