@@ -14,6 +14,7 @@ import {
   redeemPasswordReset,
   verifySecondFactor,
   logoutOtherSessions,
+  operatorSetPassword,
 } from "@/lib/services/account";
 import { currentStep, totpCode } from "@/lib/auth/totp";
 import type { Actor } from "@/lib/auth/permissions";
@@ -103,5 +104,17 @@ describe("Passwort ändern und zurücksetzen", () => {
     const inv = await createInvitation(h.db, other.admin, { role: "editor", canPublish: false, note: "" });
     await acceptInvitation(h.db, inv, { email: "ed@konto.test", displayName: "Ed", password: "zurueckgesetzt-12345" });
     await expect(createPasswordReset(h.db, admin, editorId, { resetTotp: false })).rejects.toThrow(/anderen Betriebsrat/);
+  });
+
+  it("Betreiber-Werkzeug setzt ein neues Passwort, beendet Sitzungen und kann 2FA abschalten", async () => {
+    const other = await makeTenant(h, "konto-cli");
+    const { secret } = await beginTotpSetup(h.db, SECRET, other.admin.userId);
+    await confirmTotpSetup(h.db, SECRET, other.admin.userId, totpCode(secret, currentStep()));
+    const s = await createSession(h.db, other.admin.userId);
+    await operatorSetPassword(h.db, "ADMIN@konto-cli.test", "per-kommandozeile-123", { resetTotp: true });
+    expect(await validateSession(h.db, s)).toBeNull();
+    const r = await login(h.db, SECRET, { email: "admin@konto-cli.test", password: "per-kommandozeile-123", ip: "9.9.9.9" });
+    expect(r.kind).toBe("session");
+    await expect(operatorSetPassword(h.db, "gibt-es-nicht@x.de", "egal-egal-egal-1")).rejects.toThrow(/Kein Konto/);
   });
 });

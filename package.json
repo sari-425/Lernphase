@@ -16,7 +16,9 @@
     "db:migrate": "tsx scripts/migrate.mts",
     "tenant": "tsx scripts/tenant.mts",
     "secrets": "tsx scripts/generate-secrets.mts",
-    "icons": "node scripts/render-icons.mjs"
+    "icons": "node scripts/render-icons.mjs",
+    "konten": "tsx scripts/tenant.mts accounts",
+    "passwort": "tsx scripts/tenant.mts password"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.4",

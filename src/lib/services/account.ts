@@ -210,3 +210,22 @@ export async function redeemPasswordReset(db: DB, token: string, newPassword: st
     return { userId: r.userId };
   });
 }
+
+/**
+ * Betreiber-Werkzeug (nur Kommandozeile, nie über die Weboberfläche erreichbar):
+ * neues Passwort für ein Konto setzen, z. B. wenn der einzige Admin es vergessen hat.
+ * Beendet alle Sitzungen des Kontos; optional wird auch die Zwei-Faktor-Anmeldung abgeschaltet.
+ */
+export async function operatorSetPassword(db: DB, email: string, newPassword: string, opts: { resetTotp?: boolean } = {}) {
+  const [u] = await db.select({ id: users.id }).from(users).where(eq(users.email, email.trim().toLowerCase())).limit(1);
+  if (!u) throw notFound("Kein Konto mit dieser E-Mail-Adresse.");
+  await db
+    .update(users)
+    .set({
+      passwordHash: await hashSecret(newPassword),
+      ...(opts.resetTotp ? { totpEnabled: false, totpSecretEnc: null, totpLastStep: null, recoveryCodeHashes: null } : {}),
+    })
+    .where(eq(users.id, u.id));
+  await destroyUserSessions(db, u.id);
+  return u.id;
+}

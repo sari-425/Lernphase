@@ -103,6 +103,8 @@ curl -s https://betriebsrat.ihre-domain.de/api/health
 ## Betreiber-Werkzeuge (CLI)
 ```bash
 npm run tenant -- list
+npm run konten                                   # alle Konten (E-Mail, Rolle, Betriebsrat)
+npm run passwort -- admin@xy.de [--2fa-aus]      # neues Passwort setzen (z. B. einziger Admin hat es vergessen)
 ADMIN_PASSWORD='…' npm run tenant -- create <kurzadresse> "Betriebsrat XY" admin@xy.de "Vorname Name" "XY GmbH"
 npm run tenant -- delete <kurzadresse> --ja      # löscht ALLES dieses Betriebsrats
 npm run db:migrate

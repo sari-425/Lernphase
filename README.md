@@ -55,6 +55,13 @@ Die Daten liegen im Ordner `.data/` (eingebettete PostgreSQL-Datenbank „PGlite
 
 Hinweis: Push-Benachrichtigungen und „Zum Home-Bildschirm“ als App funktionieren auf dem Handy erst mit HTTPS, also auf einem echten Server.
 
+### Passwort vergessen?
+Passwörter sind nur verschlüsselt gespeichert und können nicht angezeigt werden. Neues Passwort setzen:
+1. Server im Terminal mit **Ctrl + C** stoppen.
+2. `npm run konten` zeigt Ihre E-Mail-Adresse.
+3. `npm run passwort -- ihre@email.de` → neues Passwort (mind. 12 Zeichen) eintippen, Enter.
+4. `npm run dev` und neu anmelden.
+
 ### Produktionsmodus lokal testen
 ```bash
 npm run build

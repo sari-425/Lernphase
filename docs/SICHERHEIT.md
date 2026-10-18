@@ -42,7 +42,7 @@
 
 - Zwei-Faktor-Anmeldung ist freiwillig pro Konto (Empfehlung: für alle Administratoren aktivieren).
 - `SESSION_SECRET` nicht ändern, solange 2FA genutzt wird – das TOTP-Geheimnis ist damit verschlüsselt (sonst müssen alle 2FA neu einrichten; Admin kann per Reset-Link 2FA zurücksetzen).
-- Kein „Passwort vergessen“ per E-Mail (bewusst, kein Mailserver). Ausgleich: Admin erzeugt einen Reset-Link.
+- Kein „Passwort vergessen“ per E-Mail (bewusst, kein Mailserver). Ausgleich: Admin erzeugt einen Reset-Link; hat der einzige Admin das Passwort vergessen, setzt der Betreiber per Kommandozeile ein neues (`npm run passwort -- <email>`). Dieser Weg erfordert Zugriff auf den Server und ist über das Web nicht erreichbar.
 - Der Belegschafts-Code ist ein gemeinsames Geheimnis – kein Ersatz für persönliche Konten.
 - Die IP-Ermittlung für die Ratenbegrenzung ist ohne `TRUST_PROXY=true` hinter einem Proxy ungenau (Limit pro E-Mail greift trotzdem).
 - Viele Beschäftigte teilen sich oft eine Firmen-IP (NAT). Daher: Push-Abo bis 600/Stunde je IP, beim Belegschafts-Code zählen nur Fehlversuche (20/15 min je IP). Werte in `src/lib/services/rate-limit.ts` anpassbar.
