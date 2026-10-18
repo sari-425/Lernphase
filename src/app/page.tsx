@@ -9,9 +9,16 @@ export default async function Landing({ searchParams }: { searchParams: Promise<
   const def = env().DEFAULT_TENANT_SLUG;
   if (def) redirect(`/b/${def}`);
   const { fehler } = await searchParams;
-  const setupOpen = Boolean(env().SETUP_TOKEN) && (await countTenants(await getDb())) === 0;
+  const noTenants = (await countTenants(await getDb())) === 0;
   return (
     <main id="inhalt" className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:py-12">
+      {noTenants ? (
+        <section className="mb-8 rounded-xl border-2 border-brand-600 bg-brand-50 p-5" aria-labelledby="erste-schritte">
+          <h2 id="erste-schritte" className="text-xl font-bold text-brand-900">Erste Schritte: Noch kein Betriebsrat eingerichtet</h2>
+          <p className="mt-1">Legen Sie zuerst Ihren Betriebsrat und Ihr Administrator-Konto an. Danach melden Sie sich über „Anmeldung für Betriebsräte“ an.</p>
+          <Link href="/einrichtung" className="btn-primary mt-3">Betriebsrat einrichten</Link>
+        </section>
+      ) : null}
       <div className="grid items-start gap-8 sm:grid-cols-[1fr_16rem]">
         <div className="space-y-5">
           <h1 className="text-3xl font-bold tracking-tight text-brand-900 sm:text-4xl">Betriebsrat Direkt</h1>
@@ -34,7 +41,7 @@ export default async function Landing({ searchParams }: { searchParams: Promise<
           </ul>
           <p className="flex flex-wrap gap-3">
             <Link href="/login" className="btn-secondary">Anmeldung für Betriebsräte</Link>
-            {setupOpen ? <Link href="/einrichtung" className="btn-ghost">Ersteinrichtung</Link> : null}
+            <Link href="/einrichtung" className="btn-ghost">Neuen Betriebsrat einrichten</Link>
           </p>
         </div>
         <BrandPanel slogan="Gemeinsam stark" sloganSub="Für eine bessere Zukunft" />

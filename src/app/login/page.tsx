@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { LogoMark } from "@/components/logo";
 import { Alert } from "@/components/ui";
 import { getSessionUser } from "@/lib/server/context";
+import { getDb } from "@/lib/db";
+import { countTenants } from "@/lib/services/tenants";
 import { LoginForm } from "./login-form";
 
 export const metadata = { title: "Anmeldung" };
@@ -10,6 +12,7 @@ export const metadata = { title: "Anmeldung" };
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ abgemeldet?: string }> }) {
   if (await getSessionUser()) redirect("/admin");
   const { abgemeldet } = await searchParams;
+  const noTenants = (await countTenants(await getDb())) === 0;
   return (
     <main id="inhalt" className="mx-auto w-full max-w-md flex-1 px-4 py-10">
       <div className="mb-6 flex items-center gap-3">
@@ -19,6 +22,14 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           <p className="text-muted">Nur für Mitglieder des Betriebsrats</p>
         </div>
       </div>
+      {noTenants ? (
+        <div className="mb-4">
+          <Alert kind="info" title="Noch kein Konto vorhanden">
+            Es ist noch kein Betriebsrat eingerichtet. Legen Sie zuerst Betriebsrat und Administrator-Konto an.{" "}
+            <Link href="/einrichtung" className="link">Jetzt einrichten</Link>
+          </Alert>
+        </div>
+      ) : null}
       {abgemeldet ? <div className="mb-4"><Alert kind="success">Sie wurden abgemeldet.</Alert></div> : null}
       <div className="card">
         <LoginForm />

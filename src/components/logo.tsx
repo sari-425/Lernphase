@@ -59,7 +59,7 @@ export function BrandPanel({
   return (
     <div className="rounded-2xl bg-[#111111] px-6 py-6 text-center text-white shadow-sm">
       <LogoMark className={compact ? "mx-auto h-24 w-24" : "mx-auto h-36 w-36 sm:h-44 sm:w-44"} />
-      <p className={"mt-2 font-extrabold " + (compact ? "text-xl tracking-[0.12em]" : "text-2xl tracking-[0.18em] sm:text-3xl")}>BETRIEBSRAT</p>
+      <p className="mt-2 text-xl font-extrabold tracking-[0.12em] whitespace-nowrap">BETRIEBSRAT</p>
       {companyName ? (
         <>
           <div className="mx-auto my-2 h-px w-4/5 bg-white/80" aria-hidden="true" />

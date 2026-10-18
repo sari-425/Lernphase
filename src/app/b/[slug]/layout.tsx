@@ -40,11 +40,17 @@ export default async function TenantLayout({ children, params }: Props) {
         </div>
       </header>
       <TenantNav slug={slug} />
-      <main id="inhalt" className="mx-auto w-full max-w-5xl flex-1 px-4 pt-5 pb-28 md:pb-10">
+      <main id="inhalt" className="mx-auto w-full max-w-5xl flex-1 px-4 pt-5 pb-8 md:pb-10">
         {children}
       </main>
-      <footer className="hidden border-t border-slate-200 bg-white py-5 text-center text-sm text-muted md:block">
-        <Link href="/datenschutz" className="link">Datenschutz</Link> · <Link href="/impressum" className="link">Impressum</Link> · Keine Werbung, kein Tracking.
+      <footer className="border-t border-slate-200 bg-white px-4 pt-5 pb-24 text-center text-sm text-muted md:pb-5">
+        <Link href="/datenschutz" className="link">Datenschutz</Link> · <Link href="/impressum" className="link">Impressum</Link> ·{" "}
+        {access.member ? (
+          <Link href={`/admin/${slug}`} className="link">Verwaltung</Link>
+        ) : (
+          <Link href="/login" className="link">Anmeldung für den Betriebsrat</Link>
+        )}
+        <span className="block md:inline"> · Keine Werbung, kein Tracking.</span>
       </footer>
     </div>
   );

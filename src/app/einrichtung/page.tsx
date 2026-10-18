@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { env } from "@/lib/env";
 import { Alert, PageTitle } from "@/components/ui";
 import { SetupForm } from "./setup-form";
@@ -40,6 +41,10 @@ export default function SetupPage() {
           )}
         </Alert>
       )}
+      <p className="mt-6 flex flex-wrap gap-3">
+        <Link href="/login" className="btn-secondary">Schon eingerichtet? Zur Anmeldung</Link>
+        <Link href="/" className="btn-ghost">Zur Startseite</Link>
+      </p>
     </main>
   );
 }
