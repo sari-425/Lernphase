@@ -33,7 +33,9 @@ export type Env = z.infer<typeof schema>;
 let cached: Env | null = null;
 
 export function env(): Env {
-  if (cached) return cached;
+  // In der Entwicklung nicht zwischenspeichern: Next.js lädt eine geänderte .env.local
+  // neu, und die App soll das sofort übernehmen.
+  if (cached && process.env.NODE_ENV === "production") return cached;
   const parsed = schema.safeParse(process.env);
   if (!parsed.success) {
     throw new Error(
