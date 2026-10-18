@@ -31,6 +31,7 @@
 
 - [ ] `SESSION_SECRET`, VAPID-Schlüssel neu erzeugen (`npm run secrets`), niemals wiederverwenden
 - [ ] `SETUP_TOKEN` nach der Einrichtung **leeren** und App neu starten
+- [ ] Immer im Produktionsmodus betreiben (`NODE_ENV=production`, Docker setzt das). Nur im Entwicklungsmodus ist die allererste Einrichtung über `localhost` ohne Token erlaubt.
 - [ ] Domain mit HTTPS (Caddy), Port 3000/5432 nicht öffentlich
 - [ ] Server: automatische Sicherheitsupdates (`unattended-upgrades`), SSH nur mit Schlüssel, Firewall (nur 22/80/443)
 - [ ] Backup einrichten **und Wiederherstellung einmal testen**

@@ -129,7 +129,7 @@ export const tenantSettingsSchema = z.object({
 });
 
 export const setupSchema = z.object({
-  token: z.string().min(1, "Einrichtungs-Token fehlt."),
+  token: z.string().default(""),
   tenantName: trimmed(120).min(3, "Bitte den Namen des Betriebsrats angeben."),
   companyName: trimmed(120).default(""),
   slug: slugSchema,

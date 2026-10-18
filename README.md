@@ -30,18 +30,15 @@ git checkout claude/betriebsrat-direkt   # bis die Änderungen in den Hauptzweig
 # 2. Abhängigkeiten installieren
 npm install
 
-# 3. Konfiguration anlegen
-cp .env.example .env.local
-npm run secrets
-#   → die ausgegebenen Zeilen in .env.local einfügen (überschreiben die leeren Werte)
-#   → zusätzlich in .env.local: COOKIE_SECURE=false
+# 3. (optional) Konfiguration anlegen – für den ersten Test nicht nötig
+#    cp .env.example .env.local   und  npm run secrets  (für Push-Benachrichtigungen)
 
 # 4. Starten (Entwicklungsmodus, eingebettete Datenbank – keine Installation nötig)
 npm run dev
 ```
 
 Dann im Browser:
-1. http://localhost:3000/einrichtung öffnen, den `SETUP_TOKEN` aus `.env.local` eingeben, Betriebsrat und Admin anlegen.
+1. http://localhost:3000 öffnen → „Betriebsrat einrichten“. Beim lokalen Ausprobieren ist für die **erste** Einrichtung kein Token nötig (auf einem echten Server immer).
 2. Sie landen in der Verwaltung. Erste Mitteilung schreiben → Vorschau → veröffentlichen.
 3. Ansicht für Beschäftigte: http://localhost:3000/b/IHRE-KURZADRESSE
 4. Push testen: Seite „Benachrichtigungen“ in Chrome/Firefox/Safari am Mac öffnen → Aktivieren. (`localhost` gilt als sicher; im Netzwerk/auf dem Handy ist HTTPS nötig, siehe `docs/BETRIEB.md`.)

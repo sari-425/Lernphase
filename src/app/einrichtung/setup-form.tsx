@@ -5,7 +5,7 @@ import { TextField } from "@/components/text-field";
 import { Alert } from "@/components/ui";
 import { setupAction } from "./actions";
 
-export function SetupForm() {
+export function SetupForm({ requireToken = true }: { requireToken?: boolean }) {
   return (
     <ActionForm action={setupAction} className="space-y-5">
       {(s) => {
@@ -13,7 +13,9 @@ export function SetupForm() {
         return (
           <>
             {s.error ? <Alert kind="error">{s.error}</Alert> : null}
-            <TextField name="token" label="Einrichtungs-Token" type="password" required autoComplete="off" hint="Steht in der Server-Konfiguration (SETUP_TOKEN)." error={fe.token} />
+            {requireToken ? (
+              <TextField name="token" label="Einrichtungs-Token" type="password" required autoComplete="off" hint="Steht in der Server-Konfiguration (SETUP_TOKEN)." error={fe.token} />
+            ) : null}
             <fieldset className="space-y-4">
               <legend className="mb-2 text-lg font-bold">Betriebsrat</legend>
               <TextField name="tenantName" label="Name" required placeholder="Betriebsrat Grüner Systemtechnik" error={fe.tenantName} maxLength={120} />

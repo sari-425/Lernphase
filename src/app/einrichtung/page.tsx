@@ -2,18 +2,27 @@ import Link from "next/link";
 import { env } from "@/lib/env";
 import { Alert, PageTitle } from "@/components/ui";
 import { SetupForm } from "./setup-form";
+import { localFirstSetupAllowed } from "@/lib/server/setup";
 
 export const metadata = { title: "Einrichtung" };
 
-export default function SetupPage() {
+export default async function SetupPage() {
   const token = env().SETUP_TOKEN ?? "";
-  const enabled = token.length >= 16;
+  const localFirst = await localFirstSetupAllowed();
+  const enabled = token.length >= 16 || localFirst;
   const isDev = process.env.NODE_ENV !== "production";
   return (
     <main id="inhalt" className="mx-auto w-full max-w-xl flex-1 px-4 py-10">
       <PageTitle sub="Neuen Betriebsrat-Bereich anlegen">Einrichtung</PageTitle>
       {enabled ? (
-        <div className="card"><SetupForm /></div>
+        <div className="space-y-4">
+          {localFirst ? (
+            <Alert kind="info" title="Lokales Ausprobieren">
+              Für die allererste Einrichtung auf Ihrem eigenen Rechner ist kein Einrichtungs-Token nötig. Auf einem echten Server ist er aus Sicherheitsgründen immer Pflicht.
+            </Alert>
+          ) : null}
+          <div className="card"><SetupForm requireToken={!localFirst} /></div>
+        </div>
       ) : (
         <Alert kind="info" title="Einrichtung deaktiviert">
           <p>
