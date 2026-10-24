@@ -66,11 +66,14 @@ test("Öffentliche Startseite ohne Konto, leere Zustände und Barrierefreiheit",
   await expect(page.getByRole("link", { name: "Verwaltung" })).toHaveCount(0);
   await expectNoA11yViolations(page, "Startseite");
   await page.goto("/");
+  await expect(page.getByRole("heading", { name: "So einfach geht's" })).toBeVisible();
+  await expectNoA11yViolations(page, "Portal-Startseite");
   await page.getByLabel("Ihren Betriebsrat öffnen").fill(SLUG);
   await page.getByRole("button", { name: "Öffnen" }).click();
   await expect(page).toHaveURL(new RegExp(`/b/${SLUG}$`));
   await page.goto("/finden?adresse=gibt-es-nicht");
   await expect(page.getByText("Unter dieser Kurzadresse wurde kein Betriebsrat gefunden.")).toBeVisible();
+  await expectNoA11yViolations(page, "Portal-Startseite mit Fehlermeldung");
 });
 
 test("Impressum und Datenschutz: Angaben in den Einstellungen, öffentlich sichtbar", async ({ page }) => {
