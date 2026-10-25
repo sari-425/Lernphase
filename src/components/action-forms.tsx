@@ -21,10 +21,19 @@ export function AttachmentUpload({ action }: { action: Act }) {
           <StateMessage s={s} />
           <div>
             <label htmlFor="file" className="label">Datei hinzufügen</label>
-            <input id="file" name="file" type="file" accept="application/pdf,image/png,image/jpeg" className="block w-full text-base" aria-describedby="file-hint" />
+            <div className="rounded-lg border-2 border-dashed border-brand-200 bg-brand-50 p-3">
+              <input
+                id="file"
+                name="file"
+                type="file"
+                accept="application/pdf,image/png,image/jpeg"
+                className="block w-full cursor-pointer text-base text-slate-700 file:mr-3 file:mb-1 file:cursor-pointer file:rounded-lg file:border-2 file:border-brand-600 file:bg-white file:px-4 file:py-2 file:text-base file:font-semibold file:text-brand-900 hover:file:bg-brand-100"
+                aria-describedby="file-hint"
+              />
+            </div>
             <p id="file-hint" className="hint">PDF, PNG oder JPEG, max. 5 MB, höchstens 3 Dateien. Anhänge haben immer denselben Sichtbarkeitsbereich wie die Mitteilung. Bitte keine Dokumente mit personenbezogenen Daten hochladen.</p>
           </div>
-          <SubmitButton className="btn-secondary" pendingText="Lädt hoch …">Hochladen</SubmitButton>
+          <SubmitButton className="btn-primary" pendingText="Lädt hoch …">Hochladen</SubmitButton>
         </>
       )}
     </ActionForm>
