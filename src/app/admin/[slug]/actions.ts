@@ -169,7 +169,7 @@ export async function uploadAttachmentAction(slug: string, id: string, _prev: Ac
   } catch (err) {
     return toActionState(err);
   }
-  revalidatePath(`/admin/${slug}/mitteilungen/${id}`);
+  revalidatePath(`/admin/${slug}/mitteilungen/${id}`, "layout");
   return { ok: true, notice: "Anhang hochgeladen." };
 }
 

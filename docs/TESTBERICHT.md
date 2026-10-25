@@ -2,6 +2,8 @@
 
 Lauf vom **16.10.2026** (zweiter Durchgang nach Fertigstellung aller Funktionen) in der Entwicklungsumgebung (Linux, Node.js 22.22, PostgreSQL 16.15, Chromium/Playwright 1.64). Ergebnisse unverändert übernommen.
 
+**Nachtrag 25.10.2026** (PDF-Anhänge direkt in der Vorschau hochladen, Hinweis im Formular): `npm run check` grün (102 / 102), E2E 13 bestanden, 1 übersprungen; der E2E-Test lädt jetzt eine PDF hoch und ruft sie öffentlich ab.
+
 **Nachtrag 18.10.2026** (Impressum- und Datenschutz-Angaben in den Einstellungen): `npm run check` grün – Lint, Typprüfung, **102 / 102** Unit- + Integrationstests (12 Dateien, eingebettete DB), Build; E2E **13 bestanden**, 1 übersprungen (echter Push, siehe unten). `npm run test:pg` und der Docker-Stack wurden für diesen Nachtrag nicht erneut ausgeführt; die Tabelle unten zeigt den Lauf vom 16.10.
 
 | Prüfung | Befehl | Ergebnis |
@@ -43,7 +45,7 @@ Lauf vom **16.10.2026** (zweiter Durchgang nach Fertigstellung aller Funktionen)
 2. ✅ Startseite ohne Konto, „Betriebsrat finden“, **axe-Prüfung WCAG 2.2 AA ohne schwere Verstöße**
 2a. ✅ Impressum/Datenschutz: Hinweis „unvollständig“, Angaben in den Einstellungen speichern, öffentlich sichtbar (Link aus der Fußzeile, Links klickbar), axe-Prüfung
 3. ✅ Verwaltung ohne Anmeldung → Login; falsches Passwort
-4. ✅ Öffentliche Mitteilung: Entwurf unsichtbar (404) → Vorschau → Pflichtbestätigung → sichtbar; XSS als Text; Suche; axe-Prüfung
+4. ✅ Öffentliche Mitteilung: Entwurf unsichtbar (404) → Vorschau → **PDF-Anhang in der Vorschau hochladen** (axe-Prüfung) → Pflichtbestätigung → sichtbar; XSS als Text; Suche; axe-Prüfung
 5. ✅ Belegschafts-Code (falsch/richtig), Gremiums-Inhalt bleibt auch mit Code unsichtbar
 6. ✅ Redakteur per Einladungslink: keine Team-Rechte, kann nicht veröffentlichen, reicht zur Freigabe ein; Link nur einmal nutzbar
 7. ✅ CSRF (fremde Herkunft → 403), ungültige Push-Daten → 400, Cron ohne Geheimnis → 401

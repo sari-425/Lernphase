@@ -9,7 +9,8 @@ import { PublishPanel } from "@/components/publish-panel";
 import { Alert, PageTitle, PriorityBadge, StatusBadge, VisibilityBadge, visibilityLabel } from "@/components/ui";
 import { DEFAULT_PUSH_BODY, DEFAULT_PUSH_TITLE, URGENT_PUSH_TITLE } from "@/lib/services/push";
 import { formatDateTime } from "@/lib/time";
-import { publishAction, submitReviewAction } from "@/app/admin/[slug]/actions";
+import { publishAction, submitReviewAction, uploadAttachmentAction } from "@/app/admin/[slug]/actions";
+import { AttachmentUpload } from "@/components/action-forms";
 import { SubmitButton } from "@/components/submit-button";
 
 export const metadata = { title: "Vorschau" };
@@ -22,6 +23,7 @@ export default async function Preview({ params }: { params: Promise<{ slug: stri
   const cat = (await listCategories(db, tenant.id)).find((c) => c.id === m.categoryId);
   const check = publishCheck(m);
   const publishable = ["draft", "review", "archived"].includes(m.status);
+  const editable = ["draft", "review"].includes(m.status) || can(actor, "message.publish");
   const future = m.publishAt && m.publishAt > new Date() ? formatDateTime(m.publishAt) : null;
 
   return (
@@ -59,6 +61,22 @@ export default async function Preview({ params }: { params: Promise<{ slug: stri
         ) : null}
       </div>
       <aside className="space-y-4">
+        <section className="card space-y-3">
+          <h2 className="text-lg font-bold">Anhänge</h2>
+          {attachments.length ? (
+            <ul className="space-y-1">
+              {attachments.map((a) => (
+                <li key={a.id}><a className="link break-all" href={`/b/${slug}/anhang/${a.id}`}>📎 {a.filename}</a></li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted">Keine Anhänge.</p>
+          )}
+          {editable && attachments.length < 3 ? <AttachmentUpload action={uploadAttachmentAction.bind(null, slug, id)} /> : null}
+          {attachments.length ? (
+            <p className="text-sm text-muted">Entfernen: <Link href={`/admin/${slug}/mitteilungen/${id}`} className="link">in der Bearbeitung</Link>.</p>
+          ) : null}
+        </section>
         <section className="card space-y-3">
           <h2 className="text-lg font-bold">Veröffentlichen</h2>
           {!publishable ? (

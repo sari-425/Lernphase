@@ -23,6 +23,7 @@ async function expectNoA11yViolations(page: Page, label: string) {
 
 async function createMessage(page: Page, opts: { title: string; body: string; visibility: "public" | "staff" | "council"; push?: boolean; priority?: "normal" | "high" | "urgent" }) {
   await page.goto(`/admin/${SLUG}/mitteilungen/neu`);
+  await expect(page.getByText("PDF-Dateien oder Bilder anhängen:")).toBeVisible();
   await page.getByLabel("Titel").fill(opts.title);
   await page.getByLabel("Inhalt").fill(opts.body);
   const visLabel = { public: "Öffentlich", staff: "Belegschaft", council: "Gremium intern" }[opts.visibility];
@@ -120,6 +121,16 @@ test("Öffentliche Mitteilung: Entwurf → Vorschau → Bestätigung → veröff
   const res = await page.goto(`/b/${SLUG}/mitteilungen/${id}`);
   expect(res?.status()).toBe(404);
 
+  // PDF anhängen (Inhalt wird per Magic Bytes geprüft)
+  await admin.getByLabel("Datei hinzufügen").setInputFiles({
+    name: "Tagesordnung.pdf",
+    mimeType: "application/pdf",
+    buffer: Buffer.from("%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n"),
+  });
+  await admin.getByRole("button", { name: "Hochladen" }).click();
+  await expect(admin.getByRole("link", { name: /Tagesordnung\.pdf/ })).toBeVisible();
+  await expectNoA11yViolations(admin, "Vorschau mit Anhang");
+
   // Veröffentlichen ohne Bestätigung verhindert der Browser (Pflichtfeld); Server prüft zusätzlich
   await admin.getByRole("button", { name: "Jetzt veröffentlichen" }).click();
   await expect(admin.getByRole("heading", { name: /Vorschau/ })).toBeVisible();
@@ -133,6 +144,10 @@ test("Öffentliche Mitteilung: Entwurf → Vorschau → Bestätigung → veröff
   await expect(page.getByRole("heading", { name: "Einladung zur Betriebsversammlung" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Tagesordnung" })).toBeVisible();
   await expect(page.getByRole("listitem").filter({ hasText: "Bericht des Betriebsrats" })).toBeVisible();
+  const pdfHref = await page.getByRole("link", { name: /Tagesordnung\.pdf/ }).getAttribute("href");
+  const pdf = await page.request.get(pdfHref!);
+  expect(pdf.status()).toBe(200);
+  expect(pdf.headers()["content-type"]).toContain("application/pdf");
   // XSS wird als Text angezeigt, nicht ausgeführt
   await expect(page.getByText("<script>alert('xss')</script>", { exact: false })).toBeVisible();
   expect(await page.evaluate(() => document.querySelectorAll("article script").length)).toBe(0);

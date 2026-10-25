@@ -195,8 +195,13 @@ export function MessageForm({
           )}
         </fieldset>
 
+        {isNew ? (
+          <p className="rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-900">
+            📎 <strong>PDF-Dateien oder Bilder anhängen:</strong> zuerst „Speichern &amp; Vorschau“ – auf der Vorschau-Seite gibt es rechts bzw. unten den Bereich „Anhänge“ (PDF, PNG, JPEG, je max. 5 MB, bis zu 3 Dateien).
+          </p>
+        ) : null}
         <div className="flex flex-wrap gap-3">
-          <SubmitButton name="intent" value="preview">{isNew ? "Speichern & Vorschau" : "Speichern & Vorschau"}</SubmitButton>
+          <SubmitButton name="intent" value="preview">Speichern &amp; Vorschau</SubmitButton>
           <SubmitButton name="intent" value="save" className="btn-secondary">Als Entwurf speichern</SubmitButton>
           {!canPublish && !locked ? (
             <SubmitButton name="intent" value="review" className="btn-secondary">Zur Freigabe einreichen</SubmitButton>
