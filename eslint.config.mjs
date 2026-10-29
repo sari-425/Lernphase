@@ -20,6 +20,8 @@ const eslintConfig = defineConfig([
     "public/sw.js",
     "test-results/**",
     "playwright-report/**",
+    // Fremder Skill (Cloudflare), unverändert übernommen – siehe skills-lock.json
+    ".claude/skills/security-audit/**",
   ]),
 ]);
 
