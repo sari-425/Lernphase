@@ -27,7 +27,9 @@ export default defineConfig({
     screenshot: "only-on-failure",
     launchOptions: process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : undefined,
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  // Voller Chromium statt der Headless Shell: Diese meldet Notification.permission
+  // immer als "denied" – der Push-Test könnte dann nie aktivieren.
+  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], channel: "chromium" } }],
   webServer: {
     command: `npm run start -- -p ${PORT}`,
     url: `http://localhost:${PORT}/api/health`,

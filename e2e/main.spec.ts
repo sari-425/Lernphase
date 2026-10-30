@@ -266,7 +266,10 @@ test("Push-Abo im Browser: aktivieren, Status, deaktivieren", async ({ browser, 
   const p = await ctx.newPage();
   await p.goto(`/b/${SLUG}/benachrichtigungen`);
   await expect(p.getByText("Status:")).toBeVisible();
-  await p.getByRole("button", { name: "Benachrichtigungen aktivieren" }).click();
+  const enableButton = p.getByRole("button", { name: "Benachrichtigungen aktivieren" });
+  // Gesperrt, wenn der Browser die Berechtigung als verweigert meldet – dann sofort klar scheitern statt nach dem Test-Timeout
+  await expect(enableButton, "Knopf gesperrt: Browser meldet Benachrichtigungen als verweigert").toBeEnabled();
+  await enableButton.click();
   const outcome = p.getByText(/Benachrichtigungen sind aktiviert|fehlgeschlagen|push service|Registration failed|AbortError/i).first();
   await expect(outcome).toBeVisible({ timeout: 30_000 });
   const text = await outcome.innerText();
