@@ -20,6 +20,8 @@ const eslintConfig = defineConfig([
     "public/sw.js",
     "test-results/**",
     "playwright-report/**",
+    // Eigenständiges Medienprojekt (Konzepttrailer), nicht Teil der App
+    "trailer/**",
   ]),
 ]);
 
