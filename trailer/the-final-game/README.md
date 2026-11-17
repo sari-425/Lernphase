@@ -56,7 +56,9 @@ Alles in diesem Trailer ist eigens für das Projekt entstanden: Geometrie, Licht
 ## 3. Musik und Sounddesign
 Eine eigene Komposition in d-Moll mit eigener Akkordfolge (Dm → B♭ → Gm/D → A → Dm). Sie besteht aus synthetischen Streicherflächen, einem Sub-Drone, einem Herzschlag-Puls (66 → 98 → 104 BPM, im Finale ausdünnend), Braams auf den großen Schnitten, Risern, Foley für Tor, Countdown und Kommentare sowie einem 4-Ton-Signaturmotiv (D – A – F – E) zum Logo. Vor „Und du?“ wird die Musik fast stumm geschaltet (Ducking), danach setzt der Markenhit ein.
 
-**Sprecher:** deutsche MBROLA-Stimme, tiefer gestimmt, komprimiert und mit Raumhall. Die Computerstimme ist leicht metallisch moduliert. Für die finale Veröffentlichung empfehlen wir eine professionelle Sprecheraufnahme mit denselben Texten und Timings (siehe Tabelle).
+**Sprecher:** ElevenLabs-Stimme **„Haunting-Hector – Dark Cinematic“** (Modell Eleven v3, ein durchgehender Take für alle neun Sätze, unbearbeitet). Sie wird nur geschnitten, auf die Einsatzpunkte der Tabelle gelegt und duckt die Musik automatisch. Die frühere synthetische Stimme (espeak-ng/MBROLA, `build_audio.sh`) dient nur noch als Ausweichlösung.
+
+Einsatzpunkte: 1,15 s · 7,7 s · 9,65 s · 12,35 s · 14,4 s · 37,0 s · 45,6 s · 49,6 s · 53,95 s.
 
 ## 4. Qualitätskontrolle
 
